@@ -488,7 +488,9 @@
 <div class="chat-container">
   <!-- Welcome -->
   <div class="welcome-screen" id="welcome-screen">
-    
+    <div class="welcome-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+    </div>
     <div class="welcome-text">
       <h2>Hey, I'm Ben.</h2>
       <p>Your AI assistant — ready to think, write, explain, and explore. What's on your mind?</p>
@@ -549,14 +551,14 @@
 // MODELS
 // ═══════════════════════════════════════
 const MODELS = [
-  { id: '@cf/meta/llama-3.1-8b-instruct-fp8',         name: 'Llama 3.1 8B',          shortName: '8B',      badge: 'fast',   badgeLabel: 'Fast' },
-  { id: '@cf/meta/llama-3.1-8b-instruct-fast',         name: 'Llama 3.1 8B Fast',     shortName: '8B+',     badge: 'fast',   badgeLabel: 'Fastest' },
-  { id: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',   name: 'Llama 3.3 70B',          shortName: '70B',     badge: 'smart',  badgeLabel: 'Smart' },
-  { id: '@cf/meta/llama-4-scout-17b-16e-instruct',    name: 'Llama 4 Scout 17B',      shortName: 'L4',      badge: 'smart',  badgeLabel: 'Multimodal' },
-  { id: '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b', name: 'DeepSeek R1 32B',      shortName: 'R1',      badge: 'reason', badgeLabel: 'Reasoning' },
-  { id: '@cf/mistral/mistral-7b-instruct-v0.2',        name: 'Mistral 7B',            shortName: 'M7',      badge: 'fast',   badgeLabel: 'Fast' },
-  { id: '@cf/qwen/qwen2.5-72b-instruct',               name: 'Qwen 2.5 72B',          shortName: 'Q72',     badge: 'smart',  badgeLabel: 'Smart' },
-  { id: '@cf/google/gemma-3-12b-it',                   name: 'Gemma 3 12B',           shortName: 'G12',     badge: 'fast',   badgeLabel: 'Balanced' },
+  { id: '@cf/meta/llama-3.1-8b-instruct-fp8',              name: 'Llama 3.1 8B',         shortName: '8B',   badge: 'fast',   badgeLabel: 'Fast' },
+  { id: '@cf/meta/llama-3.1-8b-instruct-fast',             name: 'Llama 3.1 8B Fast',    shortName: '8B+',  badge: 'fast',   badgeLabel: 'Fastest' },
+  { id: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',        name: 'Llama 3.3 70B',        shortName: '70B',  badge: 'smart',  badgeLabel: 'Smart' },
+  { id: '@cf/meta/llama-4-scout-17b-16e-instruct',         name: 'Llama 4 Scout 17B',    shortName: 'L4',   badge: 'smart',  badgeLabel: 'Multimodal' },
+  { id: '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',    name: 'DeepSeek R1 32B',      shortName: 'R1',   badge: 'reason', badgeLabel: 'Reasoning' },
+  { id: '@cf/mistralai/mistral-small-3.1-24b-instruct',    name: 'Mistral Small 3.1 24B',shortName: 'M24',  badge: 'smart',  badgeLabel: 'Vision+Tools' },
+  { id: '@cf/qwen/qwq-32b',                                name: 'Qwen QwQ 32B',         shortName: 'QwQ',  badge: 'reason', badgeLabel: 'Reasoning' },
+  { id: '@cf/google/gemma-3-12b-it',                       name: 'Gemma 3 12B',          shortName: 'G12',  badge: 'fast',   badgeLabel: 'Balanced' },
 ];
 
 const STORAGE_KEY   = 'ben_chat_history';
