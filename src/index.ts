@@ -11,15 +11,15 @@ import { Env, ChatMessage } from "./types";
 // Default model (used as fallback if none sent from frontend)
 const DEFAULT_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
 
-// Allowlist of models the frontend is permitted to select
+// Allowlist of verified working models on Cloudflare Workers AI
 const ALLOWED_MODELS = [
 	"@cf/meta/llama-3.1-8b-instruct-fp8",
 	"@cf/meta/llama-3.1-8b-instruct-fast",
 	"@cf/meta/llama-3.3-70b-instruct-fp8-fast",
 	"@cf/meta/llama-4-scout-17b-16e-instruct",
 	"@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-	"@cf/mistral/mistral-7b-instruct-v0.2",
-	"@cf/qwen/qwen2.5-72b-instruct",
+	"@cf/mistralai/mistral-small-3.1-24b-instruct",
+	"@cf/qwen/qwq-32b",
 	"@cf/google/gemma-3-12b-it",
 ];
 
