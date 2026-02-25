@@ -1,17 +1,27 @@
 /**
- * LLM Chat Application Template
+ * LLM Chat Application Template — Ben
  *
  * A simple chat application using Cloudflare Workers AI.
- * This template demonstrates how to implement an LLM-powered chat interface with
- * streaming responses using Server-Sent Events (SSE).
+ * Supports dynamic model selection passed from the frontend.
  *
  * @license MIT
  */
 import { Env, ChatMessage } from "./types";
 
-// Model ID for Workers AI model
-// https://developers.cloudflare.com/workers-ai/models/
-const MODEL_ID = "@cf/meta/llama-3.1-8b-instruct-fp8";
+// Default model (used as fallback if none sent from frontend)
+const DEFAULT_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
+
+// Allowlist of models the frontend is permitted to select
+const ALLOWED_MODELS = [
+	"@cf/meta/llama-3.1-8b-instruct-fp8",
+	"@cf/meta/llama-3.1-8b-instruct-fast",
+	"@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+	"@cf/meta/llama-4-scout-17b-16e-instruct",
+	"@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+	"@cf/mistral/mistral-7b-instruct-v0.2",
+	"@cf/qwen/qwen2.5-72b-instruct",
+	"@cf/google/gemma-3-12b-it",
+];
 
 // Default system prompt
 const SYSTEM_PROMPT = `You are Ben, a sharp and thoughtful AI assistant. You're direct, warm, and genuinely useful — you don't pad responses with filler, you don't over-explain, and you don't lecture.
@@ -59,16 +69,13 @@ export default {
 
 		// API Routes
 		if (url.pathname === "/api/chat") {
-			// Handle POST requests for chat
 			if (request.method === "POST") {
 				return handleChatRequest(request, env);
 			}
-
-			// Method not allowed for other request types
 			return new Response("Method not allowed", { status: 405 });
 		}
 
-		// Handle 404 for unmatched routes
+		// 404 for unmatched routes
 		return new Response("Not found", { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
@@ -81,18 +88,27 @@ async function handleChatRequest(
 	env: Env,
 ): Promise<Response> {
 	try {
-		// Parse JSON request body
-		const { messages = [] } = (await request.json()) as {
+		// Parse request body — accept optional model field from frontend
+		const body = (await request.json()) as {
 			messages: ChatMessage[];
+			model?: string;
 		};
 
-		// Add system prompt if not present
+		const { messages = [] } = body;
+
+		// Use model from request if it's in the allowlist, otherwise fall back to default
+		const modelId =
+			body.model && ALLOWED_MODELS.includes(body.model)
+				? body.model
+				: DEFAULT_MODEL;
+
+		// Inject system prompt if not already present
 		if (!messages.some((msg) => msg.role === "system")) {
 			messages.unshift({ role: "system", content: SYSTEM_PROMPT });
 		}
 
 		const stream = await env.AI.run(
-			MODEL_ID,
+			modelId as any,
 			{
 				messages,
 				max_tokens: 1024,
@@ -101,9 +117,9 @@ async function handleChatRequest(
 			{
 				// Uncomment to use AI Gateway
 				// gateway: {
-				//   id: "YOUR_GATEWAY_ID", // Replace with your AI Gateway ID
-				//   skipCache: false,      // Set to true to bypass cache
-				//   cacheTtl: 3600,        // Cache time-to-live in seconds
+				//   id: "YOUR_GATEWAY_ID",
+				//   skipCache: false,
+				//   cacheTtl: 3600,
 				// },
 			},
 		);
