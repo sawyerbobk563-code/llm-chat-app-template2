@@ -5,22 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ben — AI Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- marked.js for markdown parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <style>
     :root {
       --orange: #f6821f;
       --orange-dim: #f6821f1a;
-      --orange-glow: #f6821f55;
+      --orange-glow: #f6821f44;
       --bg: #0a0a0f;
-      --surface: #12121a;
-      --surface2: #1a1a26;
-      --border: #ffffff0f;
-      --border-lit: #f6821f33;
-      --text: #f0eeea;
-      --text-muted: #6b6880;
-      --user-bg: #f6821f18;
-      --ai-bg: #1a1a26;
-      --radius: 16px;
+      --surface: #111118;
+      --surface2: #17171f;
+      --surface3: #1e1e2a;
+      --border: #ffffff0d;
+      --border-mid: #ffffff18;
+      --border-lit: #f6821f30;
+      --text: #edeae4;
+      --text-muted: #5e5c6e;
+      --text-dim: #8b8899;
+      --user-bg: #f6821f14;
+      --ai-bg: #17171f;
+      --code-bg: #0d0d14;
+      --radius: 14px;
+      --radius-sm: 8px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,28 +45,28 @@
     body::before {
       content: '';
       position: fixed;
-      top: -20%;
+      top: -25%;
       left: 50%;
       transform: translateX(-50%);
-      width: 700px;
-      height: 420px;
-      background: radial-gradient(ellipse, #f6821f14 0%, transparent 70%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(ellipse, #f6821f0e 0%, transparent 65%);
       pointer-events: none;
       z-index: 0;
-      animation: pulse-ambient 7s ease-in-out infinite alternate;
+      animation: pulse-ambient 8s ease-in-out infinite alternate;
     }
 
     @keyframes pulse-ambient {
-      from { opacity: 0.5; transform: translateX(-50%) scale(1); }
-      to   { opacity: 1;   transform: translateX(-50%) scale(1.2); }
+      from { opacity: 0.6; transform: translateX(-50%) scale(1); }
+      to   { opacity: 1;   transform: translateX(-50%) scale(1.15); }
     }
 
     /* ── Top bar ── */
     .top-bar {
       display: none;
       align-items: center;
-      justify-content: flex-end;
-      padding: 0.75rem 1.25rem 0;
+      justify-content: space-between;
+      padding: 0.7rem 1.25rem 0;
       flex-shrink: 0;
       position: relative;
       z-index: 10;
@@ -70,36 +77,40 @@
 
     .top-bar.visible { display: flex; }
 
-    #delete-btn {
+    .top-bar-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+
+    .top-bar-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+    .top-btn {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.75rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
+      font-size: 0.73rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 7px;
       cursor: pointer;
       letter-spacing: 0.02em;
       transition: border-color 0.2s, color 0.2s, background 0.2s;
     }
 
-    #delete-btn:hover {
-      border-color: #e5534b55;
-      color: #e5534b;
-      background: #e5534b0a;
-    }
+    .top-btn:hover { border-color: var(--border-mid); color: var(--text-dim); background: var(--surface2); }
 
-    #delete-btn svg {
-      width: 13px; height: 13px;
-      flex-shrink: 0;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    #delete-btn:hover { border-color: #e5534b44; color: #e5534b; background: #e5534b08; }
+
+    .top-btn svg {
+      width: 12px; height: 12px; flex-shrink: 0;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
     /* ── Main container ── */
@@ -123,14 +134,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1.75rem;
+      gap: 2rem;
       text-align: center;
-      animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
       overflow: hidden;
     }
 
     @keyframes fade-up {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -138,10 +149,10 @@
 
     .welcome-text h2 {
       font-family: 'Syne', sans-serif;
-      font-size: 2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #f0eeea 30%, var(--orange));
+      background: linear-gradient(135deg, #edeae4 25%, var(--orange) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -150,31 +161,60 @@
 
     .welcome-text p {
       color: var(--text-muted);
-      font-size: 0.93rem;
+      font-size: 0.92rem;
       font-weight: 300;
       max-width: 360px;
-      line-height: 1.65;
+      line-height: 1.7;
+      margin: 0 auto;
     }
 
-    /* Preset cards */
+    .welcome-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+      margin-top: 0.25rem;
+    }
+
+    .welcome-hint kbd {
+      background: var(--surface3);
+      border: 1px solid var(--border-mid);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--orange);
+    }
+
+    /* ── Preset cards — improved ── */
     .preset-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
+      gap: 0.55rem;
       width: 100%;
-      max-width: 500px;
-      transition: opacity 0.4s ease;
+      max-width: 520px;
+      transition: opacity 0.35s ease;
     }
 
     .preset-card {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.6rem 0.9rem;
+      border-radius: 11px;
+      padding: 0.75rem 1rem;
       cursor: pointer;
       text-align: left;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
-      animation: card-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      animation: card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .preset-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--orange-dim) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
     }
 
     .preset-card:nth-child(1) { animation-delay: 0.06s; }
@@ -183,24 +223,38 @@
     .preset-card:nth-child(4) { animation-delay: 0.24s; }
 
     @keyframes card-in {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     .preset-card:hover {
       border-color: var(--border-lit);
-      background: #1f1f30;
       transform: translateY(-1px);
-      box-shadow: 0 4px 20px #00000045;
+      box-shadow: 0 6px 24px #00000050;
     }
 
+    .preset-card:hover::before { opacity: 1; }
     .preset-card:active { transform: translateY(0); }
 
-    .preset-card .preset-text {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .preset-arrow {
+      position: absolute;
+      top: 0.65rem; right: 0.75rem;
+      color: var(--orange);
+      opacity: 0;
+      font-size: 0.75rem;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .preset-card:hover .preset-arrow { opacity: 1; transform: translate(2px, -2px); }
+
+    .preset-text {
+      font-size: 0.82rem;
+      color: var(--text-dim);
       font-weight: 400;
-      line-height: 1.4;
+      line-height: 1.45;
+      position: relative;
+      z-index: 1;
+      transition: color 0.2s;
     }
 
     .preset-card:hover .preset-text { color: var(--text); }
@@ -212,124 +266,331 @@
       padding: 1rem 0 0.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
       scrollbar-width: thin;
       scrollbar-color: var(--border) transparent;
     }
 
     .chat-messages::-webkit-scrollbar { width: 4px; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
     .chat-messages.hidden { display: none; }
 
-    /* ── Messages — styled via CSS, chat.js just adds .message + .user-message/.assistant-message ── */
+    /* ── Message wrapper ── */
     .message {
       display: flex;
-      gap: 0.75rem;
-      animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-      max-width: 78%;
+      gap: 0.7rem;
+      animation: slide-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+      max-width: 82%;
+      position: relative;
     }
 
     @keyframes slide-in {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     .message.user-message  { align-self: flex-end; flex-direction: row-reverse; }
     .message.assistant-message { align-self: flex-start; }
 
-    /* Pseudo-element avatars — no extra DOM needed, won't break chat.js */
+    /* Pseudo avatars */
     .message::before {
       content: '◎';
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
+      width: 30px; height: 30px; min-width: 30px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
       flex-shrink: 0;
-      margin-top: 2px;
-      background: linear-gradient(135deg, var(--orange), #ff5f1f);
-      box-shadow: 0 0 14px var(--orange-glow);
+      margin-top: 3px;
+      background: linear-gradient(135deg, var(--orange), #e5601b);
+      box-shadow: 0 0 12px var(--orange-glow);
       color: white;
     }
 
     .message.assistant-message::before {
       content: '✦';
-      background: var(--surface2);
+      background: var(--surface3);
       border: 1px solid var(--border-lit);
       box-shadow: none;
       color: var(--text-muted);
     }
 
-    .message p {
-      white-space: pre-line;
-      margin: 0;
-      overflow-wrap: anywhere;
-    }
-
-    /* The <p> inside .message is the bubble */
+    /* Message bubble */
     .message > p,
-    .message > div {
-      padding: 0.85rem 1.1rem;
+    .message > div.bubble {
+      padding: 0.8rem 1rem;
       border-radius: var(--radius);
-      font-size: 0.92rem;
-      line-height: 1.65;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      flex: 1;
+      min-width: 0;
     }
 
     .user-message > p,
-    .user-message > div {
+    .user-message > div.bubble {
       background: var(--user-bg);
       border: 1px solid var(--border-lit);
       border-bottom-right-radius: 4px;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
     }
 
     .assistant-message > p,
-    .assistant-message > div {
+    .assistant-message > div.bubble {
       background: var(--ai-bg);
       border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
+    }
+
+    /* ── Message actions (copy buttons) ── */
+    .msg-actions {
+      display: flex;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+      opacity: 0;
+      transition: opacity 0.15s;
+      justify-content: flex-start;
+      padding-left: calc(30px + 0.7rem);
+    }
+
+    .message.user-message + .msg-actions { justify-content: flex-end; padding-left: 0; padding-right: calc(30px + 0.7rem); }
+    .message:hover + .msg-actions,
+    .msg-actions:hover { opacity: 1; }
+
+    .msg-action-btn {
+      display: flex; align-items: center; gap: 0.3rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.55rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .msg-action-btn:hover { color: var(--text); border-color: var(--border-mid); background: var(--surface3); }
+    .msg-action-btn.copied { color: #4ade80; border-color: #4ade8033; }
+
+    .msg-action-btn svg {
+      width: 11px; height: 11px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ── Markdown rendering inside assistant bubbles ── */
+    .md-content { font-size: 0.9rem; line-height: 1.7; }
+
+    .md-content p { margin-bottom: 0.6em; }
+    .md-content p:last-child { margin-bottom: 0; }
+
+    .md-content strong { font-weight: 600; color: var(--text); }
+    .md-content em { font-style: italic; color: var(--text-dim); }
+    .md-content u { text-decoration: underline; text-underline-offset: 3px; }
+
+    .md-content h1, .md-content h2, .md-content h3, .md-content h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0.9em 0 0.4em;
+      line-height: 1.3;
+    }
+    .md-content h1 { font-size: 1.1rem; }
+    .md-content h2 { font-size: 1rem; }
+    .md-content h3 { font-size: 0.93rem; }
+    .md-content h1:first-child,
+    .md-content h2:first-child,
+    .md-content h3:first-child { margin-top: 0; }
+
+    .md-content ul, .md-content ol {
+      padding-left: 1.3em;
+      margin: 0.4em 0 0.6em;
+    }
+
+    .md-content li { margin-bottom: 0.25em; }
+    .md-content li::marker { color: var(--orange); }
+
+    .md-content blockquote {
+      border-left: 3px solid var(--border-lit);
+      padding: 0.4em 0.8em;
+      margin: 0.6em 0;
+      color: var(--text-dim);
+      background: var(--surface3);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .md-content hr {
+      border: none;
+      border-top: 1px solid var(--border-mid);
+      margin: 0.8em 0;
+    }
+
+    .md-content a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Inline code */
+    .md-content code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8em;
+      background: var(--code-bg);
+      border: 1px solid var(--border-mid);
+      padding: 0.15em 0.45em;
+      border-radius: 4px;
+      color: #f9a86b;
+    }
+
+    /* Code blocks */
+    .code-block {
+      margin: 0.7em 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-mid);
+      background: var(--code-bg);
+    }
+
+    .code-block:last-child { margin-bottom: 0; }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.85rem;
+      background: #0a0a12;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-lang {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      text-transform: lowercase;
+    }
+
+    .code-copy-btn {
+      display: flex; align-items: center; gap: 0.3rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .code-copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
+    .code-copy-btn.copied { color: #4ade80; border-color: #4ade8033; }
+
+    .code-copy-btn svg {
+      width: 10px; height: 10px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-mid) transparent;
+    }
+
+    .code-block pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.65;
+      color: #c9c0d3;
+      background: none;
+      border: none;
+      padding: 0;
+      white-space: pre;
+    }
+
+    /* ── /commands panel ── */
+    .commands-panel {
+      background: var(--surface2);
+      border: 1px solid var(--border-mid);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+      animation: slide-in 0.25s ease both;
+    }
+
+    .commands-header {
+      padding: 0.7rem 1rem;
+      background: var(--surface3);
+      border-bottom: 1px solid var(--border);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .commands-header span { color: var(--orange); }
+
+    .command-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .command-item:last-child { border-bottom: none; }
+    .command-item:hover { background: var(--surface3); }
+
+    .command-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--orange);
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .command-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
     /* ── Typing indicator ── */
     .typing-indicator {
       display: none;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0 0 0.5rem;
+      gap: 0.7rem;
+      padding: 0 0 0.4rem;
     }
 
     .typing-indicator.visible { display: flex; }
 
-    /* Avatar for typing indicator */
     .typing-indicator::before {
       content: '✦';
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: var(--surface2);
+      width: 30px; height: 30px; min-width: 30px;
+      border-radius: 9px;
+      background: var(--surface3);
       border: 1px solid var(--border-lit);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0;
       color: var(--text-muted);
     }
 
     .typing-dots {
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      display: flex; align-items: center; gap: 5px;
       background: var(--ai-bg);
       border: 1px solid var(--border);
-      padding: 0.75rem 1rem;
+      padding: 0.7rem 0.9rem;
       border-radius: var(--radius);
       border-bottom-left-radius: 4px;
     }
 
     .typing-dots span {
-      width: 7px; height: 7px;
+      width: 6px; height: 6px;
       background: var(--text-muted);
       border-radius: 50%;
       display: inline-block;
@@ -339,24 +600,24 @@
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes bounce {
-      0%, 80%, 100% { transform: scale(1); opacity: 0.4; }
-      40% { transform: scale(1.2); opacity: 1; }
+      0%, 80%, 100% { transform: scale(1); opacity: 0.35; }
+      40% { transform: scale(1.25); opacity: 1; }
     }
 
     /* ── Input area ── */
     .message-input-area {
-      padding: 0.75rem 0 0;
+      padding: 0.65rem 0 0;
       flex-shrink: 0;
     }
 
     .input-wrapper {
       display: flex;
       align-items: flex-end;
-      gap: 0.6rem;
+      gap: 0.55rem;
       background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0.6rem 0.6rem 0.6rem 1rem;
+      border: 1px solid var(--border-mid);
+      border-radius: 13px;
+      padding: 0.55rem 0.55rem 0.55rem 1rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
@@ -371,37 +632,32 @@
       border: none; outline: none;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem; font-weight: 400; line-height: 1.6;
+      font-size: 0.91rem; font-weight: 400; line-height: 1.6;
       resize: none;
-      min-height: 28px; max-height: 160px;
+      min-height: 26px; max-height: 150px;
       overflow-y: auto; scrollbar-width: thin;
       caret-color: var(--orange);
     }
 
     #user-input::placeholder { color: var(--text-muted); }
-    #user-input:disabled { opacity: 0.5; }
+    #user-input:disabled { opacity: 0.45; }
 
     #send-button {
-      width: 38px; height: 38px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, var(--orange), #e5711b);
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--orange), #d96818);
       color: white; border: none;
-      border-radius: 10px; cursor: pointer;
+      border-radius: 9px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 0 16px var(--orange-glow);
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 0 14px var(--orange-glow);
     }
 
-    #send-button:hover { transform: scale(1.06); box-shadow: 0 0 24px var(--orange-glow); }
-    #send-button:active { transform: scale(0.97); }
-
-    #send-button:disabled {
-      background: var(--surface2);
-      box-shadow: none; cursor: not-allowed; opacity: 0.4;
-    }
+    #send-button:hover { transform: scale(1.07); box-shadow: 0 0 22px var(--orange-glow); }
+    #send-button:active { transform: scale(0.96); }
+    #send-button:disabled { background: var(--surface3); box-shadow: none; cursor: not-allowed; opacity: 0.4; }
 
     #send-button svg {
-      width: 16px; height: 16px;
+      width: 15px; height: 15px;
       fill: none; stroke: currentColor;
       stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
       transition: transform 0.2s;
@@ -411,125 +667,98 @@
 
     /* ── Disclaimer ── */
     .disclaimer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      margin-top: 0.55rem;
-      font-size: 0.69rem;
-      color: var(--text-muted);
-      letter-spacing: 0.02em;
-      opacity: 0.7;
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      margin-top: 0.5rem;
+      font-size: 0.67rem; color: var(--text-muted);
+      letter-spacing: 0.02em; opacity: 0.6;
     }
 
     .disclaimer svg {
-      width: 11px; height: 11px;
-      flex-shrink: 0; opacity: 0.6;
-      fill: none; stroke: currentColor;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      width: 10px; height: 10px; flex-shrink: 0; opacity: 0.5;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
     }
 
     footer {
-      text-align: center;
-      font-size: 0.67rem;
-      color: #2e2c3a;
-      padding: 0.4rem 1rem 0.7rem;
-      flex-shrink: 0;
-      letter-spacing: 0.04em;
-      z-index: 1;
+      text-align: center; font-size: 0.65rem; color: #25232f;
+      padding: 0.35rem 1rem 0.6rem;
+      flex-shrink: 0; letter-spacing: 0.04em; z-index: 1;
     }
 
     /* ── Confirm toast ── */
     .confirm-toast {
-      position: fixed;
-      top: 1rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(-10px);
+      position: fixed; top: 1rem; left: 50%;
+      transform: translateX(-50%) translateY(-8px);
       background: var(--surface2);
-      border: 1px solid #e5534b55;
+      border: 1px solid #e5534b44;
       border-radius: 10px;
-      padding: 0.6rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: var(--text);
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
+      padding: 0.55rem 0.9rem;
+      display: flex; align-items: center; gap: 0.7rem;
+      font-size: 0.78rem; color: var(--text);
+      z-index: 200; opacity: 0; pointer-events: none;
       transition: opacity 0.2s, transform 0.2s;
-      white-space: nowrap;
+      white-space: nowrap; box-shadow: 0 8px 32px #00000060;
     }
 
-    .confirm-toast.show {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateX(-50%) translateY(0);
-    }
+    .confirm-toast.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
 
     .confirm-toast button {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
-      padding: 0.3rem 0.7rem;
-      border-radius: 6px;
-      cursor: pointer;
-      border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.76rem;
+      padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; border: none;
     }
 
     .confirm-toast .btn-confirm { background: #e5534b; color: white; }
-    .confirm-toast .btn-cancel {
-      background: transparent;
-      border: 1px solid var(--border) !important;
-      color: var(--text-muted);
-    }
+    .confirm-toast .btn-cancel { background: transparent; border: 1px solid var(--border-mid) !important; color: var(--text-muted); }
+
+    /* ── Scrollbar ── */
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
 
     @media (max-width: 520px) {
       .preset-grid { grid-template-columns: 1fr; }
-      .message { max-width: 92%; }
-      .welcome-text h2 { font-size: 1.55rem; }
+      .message { max-width: 94%; }
+      .welcome-text h2 { font-size: 1.6rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- Top bar — shown only when chat is active -->
+<!-- Top bar -->
 <div class="top-bar" id="top-bar">
-  <button id="delete-btn" aria-label="Clear conversation">
-    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-    Clear chat
-  </button>
+  <span class="top-bar-title">Ben</span>
+  <div class="top-bar-actions">
+    <button class="top-btn" id="delete-btn">
+      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Clear chat
+    </button>
+  </div>
 </div>
 
 <div class="chat-container">
 
-  <!-- Welcome / empty state -->
+  <!-- Welcome screen -->
   <div class="welcome-screen" id="welcome-screen">
     <div class="welcome-text">
       <h2>Hey, I'm Ben.</h2>
-      <p>Your AI assistant — ready to think, write, explain, and explore alongside you. What's on your mind?</p>
+      <p>Your AI assistant — ready to think, write, explain, and explore. What's on your mind?</p>
+      <p class="welcome-hint">Type <kbd>/</kbd> for a list of commands</p>
     </div>
     <div class="preset-grid" id="preset-grid"></div>
   </div>
 
-  <!-- chat-messages: chat.js appends .message.user-message / .message.assistant-message directly here -->
+  <!-- Messages -->
   <div id="chat-messages" class="chat-messages hidden"></div>
 
-  <!-- Typing indicator: chat.js toggles .visible on this -->
+  <!-- Typing indicator -->
   <div class="typing-indicator" id="typing-indicator">
     <div class="typing-dots">
       <span></span><span></span><span></span>
     </div>
   </div>
 
-  <!-- Input: chat.js reads #user-input and #send-button -->
+  <!-- Input -->
   <div class="message-input-area">
     <div class="input-wrapper">
-      <textarea
-        id="user-input"
-        placeholder="Ask Ben anything…"
-        rows="1"
-        autofocus
-      ></textarea>
+      <textarea id="user-input" placeholder="Ask Ben anything… or type / for commands" rows="1" autofocus></textarea>
       <button id="send-button" aria-label="Send message">
         <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
@@ -543,22 +772,252 @@
 
 <footer>Powered by Cloudflare Workers AI &copy; 2025</footer>
 
-<!-- Confirm delete toast -->
 <div class="confirm-toast" id="confirm-toast">
   <span>Clear entire conversation?</span>
   <button class="btn-confirm" id="confirm-yes">Clear</button>
   <button class="btn-cancel" id="confirm-no">Cancel</button>
 </div>
 
-<!-- chat.js must load first — it wires up #user-input, #send-button, #chat-messages, #typing-indicator -->
 <script src="chat.js"></script>
 
 <script>
+  // ── Config ──
   const STORAGE_KEY = 'ben_chat_history';
+
+  // ── DOM refs ──
   const welcomeScreen = document.getElementById('welcome-screen');
   const chatMessagesEl = document.getElementById('chat-messages');
   const topBar = document.getElementById('top-bar');
   const presetGrid = document.getElementById('preset-grid');
+  const userInputEl = document.getElementById('user-input');
+  const toast = document.getElementById('confirm-toast');
+
+  // ── Configure marked.js ──
+  if (typeof marked !== 'undefined') {
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+    });
+  }
+
+  // ── Parse markdown + build code blocks ──
+  function renderMarkdown(text) {
+    if (typeof marked === 'undefined') return `<p>${text}</p>`;
+
+    // Parse markdown
+    let html = marked.parse(text);
+
+    // Wrap <pre><code> blocks with our custom code-block UI
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+
+    tmp.querySelectorAll('pre').forEach(pre => {
+      const codeEl = pre.querySelector('code');
+      if (!codeEl) return;
+
+      // Detect language from class like "language-javascript"
+      const langClass = [...codeEl.classList].find(c => c.startsWith('language-'));
+      const lang = langClass ? langClass.replace('language-', '') : 'code';
+      const rawCode = codeEl.textContent;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block';
+      wrapper.innerHTML = `
+        <div class="code-header">
+          <span class="code-lang">${lang}</span>
+          <button class="code-copy-btn" data-code>
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre><code>${escapeHtml(rawCode)}</code></pre>
+      `;
+
+      wrapper.querySelector('.code-copy-btn').addEventListener('click', function() {
+        navigator.clipboard.writeText(rawCode).then(() => {
+          this.classList.add('copied');
+          this.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+          setTimeout(() => {
+            this.classList.remove('copied');
+            this.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
+          }, 2000);
+        });
+      });
+
+      pre.replaceWith(wrapper);
+    });
+
+    return tmp.innerHTML;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Copy button helper ──
+  function makeCopyBtn(getText) {
+    const btn = document.createElement('button');
+    btn.className = 'msg-action-btn';
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(getText()).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
+        }, 2000);
+      });
+    });
+    return btn;
+  }
+
+  // ── Add action buttons below a message ──
+  function attachActions(msgEl, isUser) {
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+    if (isUser) msgEl.classList.add('user-message-parent');
+
+    const copyBtn = makeCopyBtn(() => {
+      const bubble = msgEl.querySelector('.bubble, p');
+      return bubble ? (bubble.innerText || bubble.textContent) : '';
+    });
+    actions.appendChild(copyBtn);
+
+    msgEl.insertAdjacentElement('afterend', actions);
+
+    // Keep actions visible when hovering message OR actions
+    msgEl.addEventListener('mouseenter', () => actions.style.opacity = '1');
+    msgEl.addEventListener('mouseleave', () => {
+      if (!actions.matches(':hover')) actions.style.opacity = '0';
+    });
+    actions.addEventListener('mouseleave', () => actions.style.opacity = '0');
+  }
+
+  // ── Upgrade a bare message element (from chat.js) ──
+  // Wraps p content in a .bubble div and applies markdown for assistant messages
+  function upgradeMessageEl(el, isStreaming) {
+    const p = el.querySelector('p');
+    if (!p) return;
+
+    const isUser = el.classList.contains('user-message');
+
+    if (isUser) {
+      // User messages: keep as-is but wrap in bubble
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.style.whiteSpace = 'pre-line';
+      bubble.style.overflowWrap = 'anywhere';
+      bubble.textContent = p.textContent;
+      p.replaceWith(bubble);
+    } else {
+      // Assistant messages: render markdown
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble md-content';
+      if (!isStreaming) {
+        bubble.innerHTML = renderMarkdown(p.textContent);
+      } else {
+        // During streaming, store raw text and re-render periodically
+        bubble._rawText = '';
+        bubble.innerHTML = '';
+      }
+      el._bubbleEl = bubble;
+      el._rawText = p.textContent;
+      p.replaceWith(bubble);
+    }
+  }
+
+  // ── /commands ──
+  const COMMANDS = [
+    { name: '/help',    desc: 'Show all available commands' },
+    { name: '/clear',   desc: 'Clear the chat history' },
+    { name: '/ideas',   desc: 'Get creative project ideas' },
+    { name: '/explain', desc: 'Ask Ben to explain a concept simply' },
+    { name: '/write',   desc: 'Start a writing task' },
+    { name: '/code',    desc: 'Get help with code' },
+    { name: '/summary', desc: 'Summarise a topic or text' },
+    { name: '/bullet',  desc: 'Get a bullet-point breakdown of something' },
+  ];
+
+  function showCommandsPanel() {
+    // Remove existing panel if any
+    const existing = chatMessagesEl.querySelector('.commands-panel');
+    if (existing) existing.remove();
+
+    showChat();
+
+    const panel = document.createElement('div');
+    panel.className = 'commands-panel message assistant-message';
+    panel.style.maxWidth = '100%';
+    panel.style.alignSelf = 'stretch';
+    panel.innerHTML = `
+      <div class="commands-header">
+        <span>/ </span>Commands
+      </div>
+      ${COMMANDS.map(c => `
+        <div class="command-item" data-cmd="${c.name}">
+          <span class="command-name">${c.name}</span>
+          <span class="command-desc">${c.desc}</span>
+        </div>
+      `).join('')}
+    `;
+
+    panel.querySelectorAll('.command-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cmd = item.dataset.cmd;
+        panel.remove();
+        handleCommand(cmd);
+      });
+    });
+
+    chatMessagesEl.appendChild(panel);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  }
+
+  function handleCommand(cmd) {
+    const cmdMap = {
+      '/help':    () => showCommandsPanel(),
+      '/clear':   () => { toast.classList.add('show'); },
+      '/ideas':   () => sendPreset('Give me 5 creative project ideas for a weekend'),
+      '/explain': () => { userInputEl.value = 'Explain: '; userInputEl.focus(); },
+      '/write':   () => { userInputEl.value = 'Help me write: '; userInputEl.focus(); },
+      '/code':    () => { userInputEl.value = 'Help me with this code: '; userInputEl.focus(); },
+      '/summary': () => { userInputEl.value = 'Summarise: '; userInputEl.focus(); },
+      '/bullet':  () => { userInputEl.value = 'Give me a bullet-point breakdown of: '; userInputEl.focus(); },
+    };
+    if (cmdMap[cmd]) cmdMap[cmd]();
+  }
+
+  function sendPreset(text) {
+    userInputEl.value = text;
+    userInputEl.dispatchEvent(new Event('input'));
+    showChat();
+    document.getElementById('send-button').click();
+  }
+
+  // ── Intercept user input for /commands ──
+  // We patch into the keydown event — if Enter is pressed with /command, intercept
+  userInputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const val = this.value.trim();
+      if (val.startsWith('/')) {
+        e.preventDefault();
+        e.stopImmediatePropagation(); // prevent chat.js from sending
+        const cmd = val.split(' ')[0].toLowerCase();
+        if (COMMANDS.find(c => c.name === cmd)) {
+          this.value = '';
+          this.style.height = 'auto';
+          handleCommand(cmd);
+        } else {
+          // Unknown command — show panel
+          this.value = '';
+          this.style.height = 'auto';
+          showCommandsPanel();
+        }
+        return false;
+      }
+    }
+  }, true); // capture phase so we run before chat.js
 
   // ── Preset questions ──
   const ALL_PRESETS = [
@@ -586,33 +1045,21 @@
       const card = document.createElement('button');
       card.className = 'preset-card';
       card.style.animationDelay = `${0.06 + i * 0.06}s`;
-      card.innerHTML = `<span class="preset-text">${p.text}</span>`;
-      card.addEventListener('click', () => {
-        document.getElementById('user-input').value = p.text;
-        // Trigger resize
-        const ev = new Event('input');
-        document.getElementById('user-input').dispatchEvent(ev);
-        // Let chat.js handle the actual send
-        showChat();
-        document.getElementById('send-button').click();
-      });
+      card.innerHTML = `<span class="preset-text">${p.text}</span><span class="preset-arrow">↗</span>`;
+      card.addEventListener('click', () => sendPreset(p.text));
       presetGrid.appendChild(card);
     });
   }
 
   renderPresets(pickPresets());
 
-  // Cycle every 20s
   setInterval(() => {
     if (welcomeScreen.classList.contains('hidden')) return;
     presetGrid.style.opacity = '0';
-    setTimeout(() => {
-      renderPresets(pickPresets());
-      presetGrid.style.opacity = '1';
-    }, 400);
+    setTimeout(() => { renderPresets(pickPresets()); presetGrid.style.opacity = '1'; }, 380);
   }, 20000);
 
-  // ── Show chat view ──
+  // ── Show chat ──
   function showChat() {
     if (!welcomeScreen.classList.contains('hidden')) {
       welcomeScreen.classList.add('hidden');
@@ -627,86 +1074,121 @@
     catch { return []; }
   }
 
-  function saveToStorage(role, text) {
-    const h = loadHistory();
-    h.push({ role, text });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
-  }
+  function clearStorage() { localStorage.removeItem(STORAGE_KEY); }
 
-  function clearStorage() {
-    localStorage.removeItem(STORAGE_KEY);
-  }
-
-  // ── Restore history on load ──
-  // We patch chatHistory (the array in chat.js) and render the saved messages visually
+  // ── Restore saved history ──
   function restoreHistory() {
     const saved = loadHistory();
     if (!saved.length) return;
 
     showChat();
 
-    // Rebuild chat.js's internal chatHistory state so it sends correct context
-    // chat.js initializes chatHistory with one assistant message; we replace it
     if (typeof chatHistory !== 'undefined') {
       chatHistory.length = 0;
-      saved.forEach(({ role, text }) => {
-        chatHistory.push({ role, content: text });
-      });
+      saved.forEach(({ role, text }) => chatHistory.push({ role, content: text }));
     }
 
-    // Render saved messages visually (no animation)
     saved.forEach(({ role, text }) => {
       const el = document.createElement('div');
       el.className = `message ${role}-message`;
       el.style.animation = 'none';
       el.innerHTML = `<p>${text}</p>`;
+      upgradeMessageEl(el, false);
       chatMessagesEl.appendChild(el);
+      attachActions(el, role === 'user');
     });
 
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }
 
-  // ── Intercept chat.js message appends to: show chat + save to localStorage ──
-  // We watch for new .message elements added by chat.js
-  // IMPORTANT: we do NOT replace or modify elements — only observe and save
+  // ── MutationObserver: intercept messages from chat.js ──
   const observer = new MutationObserver(mutations => {
     for (const m of mutations) {
       for (const node of m.addedNodes) {
         if (node.nodeType !== 1 || !node.classList.contains('message')) continue;
-        showChat();
+        // Skip commands panel which we added ourselves
+        if (node.classList.contains('commands-panel')) continue;
 
-        // Save to localStorage once text is available
-        // For streaming assistant messages, text builds up — we save on finalize
-        // We use a small trick: save user messages immediately, save assistant on next tick
+        showChat();
         const isUser = node.classList.contains('user-message');
+
         if (isUser) {
-          const text = node.querySelector('p')?.textContent || '';
-          if (text) saveToStorage('user', text);
+          // User message: upgrade immediately
+          upgradeMessageEl(node, false);
+          attachActions(node, true);
+
+          const text = node.querySelector('.bubble, p')?.textContent || '';
+          if (text) {
+            const h = loadHistory();
+            h.push({ role: 'user', text });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
+          }
         } else {
-          // Assistant message: text streams in, wait for it to finish
-          // We watch the p element for changes and save when streaming stops
-          const p = node.querySelector('p');
-          if (!p) continue;
+          // Assistant message: streaming — upgrade with empty bubble, then watch for text
+          upgradeMessageEl(node, true);
+          attachActions(node, false);
+
+          const bubble = node._bubbleEl;
+          if (!bubble) continue;
+
+          // The original <p> was replaced. But chat.js still holds a reference to it
+          // via assistantTextEl. We need to intercept textContent assignments.
+          // Strategy: poll for text changes and re-render markdown incrementally.
+          let lastText = '';
           let saveTimer = null;
-          const textObserver = new MutationObserver(() => {
+          let renderTimer = null;
+
+          const checkText = () => {
+            // chat.js writes to its own p element ref — we need to find updated text.
+            // Since we replaced p with bubble, chat.js's ref is now detached.
+            // We solve this by patching chat.js's assistantTextEl indirectly:
+            // chat.js appends the message, then sets textContent on the p.
+            // We intercept via a MutationObserver on the parent.
+          };
+
+          // Since bubble replaced the original p that chat.js holds a ref to,
+          // chat.js will keep writing to the detached p. We need to bridge the gap.
+          // Solution: create a hidden sink p that chat.js writes to, mirror to bubble.
+          const sinkP = document.createElement('p');
+          sinkP.style.display = 'none';
+          node.appendChild(sinkP);
+
+          // Override the p that chat.js cached (assistantTextEl) — not possible directly,
+          // so instead we watch sinkP AND directly observe via a proxy approach.
+          // Actually the simplest fix: observe all text changes in the node itself.
+          const streamObserver = new MutationObserver(() => {
+            // Find any p element in the node that has text (might be sinkP or original)
+            const allP = node.querySelectorAll('p');
+            let rawText = '';
+            allP.forEach(p => { if (p.textContent) rawText += p.textContent; });
+
+            if (rawText === lastText) return;
+            lastText = rawText;
+            bubble._rawText = rawText;
+
+            // Throttle re-render during streaming (every 80ms max)
+            clearTimeout(renderTimer);
+            renderTimer = setTimeout(() => {
+              bubble.innerHTML = renderMarkdown(rawText);
+            }, 80);
+
+            // Save after streaming stops (800ms of no changes)
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
-              // No updates for 800ms = streaming done
-              const finalText = p.textContent || '';
+              const finalText = rawText;
               if (finalText) {
-                // Update stored history — replace last assistant entry if it exists
                 const h = loadHistory();
-                // Remove any incomplete assistant entry we may have added
-                if (h.length && h[h.length - 1].role === 'assistant' && h[h.length - 1]._pending) {
-                  h.pop();
-                }
                 h.push({ role: 'assistant', text: finalText });
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
               }
-              textObserver.disconnect();
-            }, 800);
+              streamObserver.disconnect();
+              // Final render
+              bubble.innerHTML = renderMarkdown(finalText);
+              chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            }, 900);
           });
-          textObserver.observe(p, { childList: true, characterData: true, subtree: true });
+
+          streamObserver.observe(node, { childList: true, characterData: true, subtree: true });
         }
       }
     }
@@ -714,18 +1196,12 @@
 
   observer.observe(chatMessagesEl, { childList: true });
 
-  // ── Delete / clear chat ──
-  const toast = document.getElementById('confirm-toast');
-
-  document.getElementById('delete-btn').addEventListener('click', () => {
-    toast.classList.add('show');
-  });
+  // ── Delete chat ──
+  document.getElementById('delete-btn').addEventListener('click', () => toast.classList.add('show'));
 
   document.getElementById('confirm-yes').addEventListener('click', () => {
     toast.classList.remove('show');
     clearStorage();
-
-    // Clear visual messages
     chatMessagesEl.innerHTML = '';
     chatMessagesEl.classList.add('hidden');
     topBar.classList.remove('visible');
@@ -733,20 +1209,13 @@
     welcomeScreen.style.animation = 'none';
     requestAnimationFrame(() => { welcomeScreen.style.animation = ''; });
     renderPresets(pickPresets());
-
-    // Reset chat.js's internal state
     if (typeof chatHistory !== 'undefined') {
       chatHistory.length = 0;
-      chatHistory.push({
-        role: 'assistant',
-        content: "Hello! I'm Ben. How can I help you today?"
-      });
+      chatHistory.push({ role: 'assistant', content: "Hello! I'm Ben. How can I help you today?" });
     }
   });
 
-  document.getElementById('confirm-no').addEventListener('click', () => {
-    toast.classList.remove('show');
-  });
+  document.getElementById('confirm-no').addEventListener('click', () => toast.classList.remove('show'));
 
   // ── Init ──
   restoreHistory();
