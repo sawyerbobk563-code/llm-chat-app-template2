@@ -6,7 +6,6 @@
   <title>Ben — AI Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <!-- marked.js for markdown parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <style>
     :root {
@@ -27,7 +26,6 @@
       --ai-bg: #17171f;
       --code-bg: #0d0d14;
       --radius: 14px;
-      --radius-sm: 8px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,14 +43,11 @@
     body::before {
       content: '';
       position: fixed;
-      top: -25%;
-      left: 50%;
+      top: -25%; left: 50%;
       transform: translateX(-50%);
-      width: 800px;
-      height: 500px;
+      width: 800px; height: 500px;
       background: radial-gradient(ellipse, #f6821f0e 0%, transparent 65%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
       animation: pulse-ambient 8s ease-in-out infinite alternate;
     }
 
@@ -68,650 +63,357 @@
       justify-content: space-between;
       padding: 0.7rem 1.25rem 0;
       flex-shrink: 0;
-      position: relative;
-      z-index: 10;
-      max-width: 780px;
-      width: 100%;
-      margin: 0 auto;
+      position: relative; z-index: 10;
+      max-width: 780px; width: 100%; margin: 0 auto;
     }
-
     .top-bar.visible { display: flex; }
 
     .top-bar-title {
       font-family: 'Syne', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      letter-spacing: 0.02em;
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--text-dim); letter-spacing: 0.02em;
     }
 
     .top-bar-actions { display: flex; gap: 0.5rem; align-items: center; }
 
     .top-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
+      display: flex; align-items: center; gap: 0.35rem;
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.73rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 7px;
-      cursor: pointer;
+      font-size: 0.73rem; padding: 0.35rem 0.75rem;
+      border-radius: 7px; cursor: pointer;
       letter-spacing: 0.02em;
       transition: border-color 0.2s, color 0.2s, background 0.2s;
     }
-
     .top-btn:hover { border-color: var(--border-mid); color: var(--text-dim); background: var(--surface2); }
-
     #delete-btn:hover { border-color: #e5534b44; color: #e5534b; background: #e5534b08; }
-
-    .top-btn svg {
-      width: 12px; height: 12px; flex-shrink: 0;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
+    .top-btn svg { width: 12px; height: 12px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     /* ── Main container ── */
     .chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-      max-width: 780px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 1.25rem;
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; position: relative; z-index: 1;
+      max-width: 780px; width: 100%; margin: 0 auto; padding: 0 1.25rem;
     }
 
     /* ── Welcome screen ── */
     .welcome-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-      text-align: center;
-      animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem; text-align: center;
+      animation: fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both;
       overflow: hidden;
     }
-
     @keyframes fade-up {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     .welcome-screen.hidden { display: none; }
 
     .welcome-text h2 {
       font-family: 'Syne', sans-serif;
-      font-size: 2.1rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em;
       background: linear-gradient(135deg, #edeae4 25%, var(--orange) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       margin-bottom: 0.5rem;
     }
-
-    .welcome-text p {
-      color: var(--text-muted);
-      font-size: 0.92rem;
-      font-weight: 300;
-      max-width: 360px;
-      line-height: 1.7;
-      margin: 0 auto;
-    }
-
-    .welcome-hint {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      opacity: 0.6;
-      margin-top: 0.25rem;
-    }
-
+    .welcome-text p { color: var(--text-muted); font-size: 0.92rem; font-weight: 300; max-width: 360px; line-height: 1.7; margin: 0 auto; }
+    .welcome-hint { font-size: 0.72rem; color: var(--text-muted); opacity: 0.6; margin-top: 0.3rem; }
     .welcome-hint kbd {
-      background: var(--surface3);
-      border: 1px solid var(--border-mid);
-      border-radius: 4px;
-      padding: 0.1rem 0.4rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--orange);
+      background: var(--surface3); border: 1px solid var(--border-mid);
+      border-radius: 4px; padding: 0.1rem 0.4rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--orange);
     }
 
-    /* ── Preset cards — improved ── */
+    /* ── Preset cards ── */
     .preset-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.55rem;
-      width: 100%;
-      max-width: 520px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.55rem; width: 100%; max-width: 520px;
       transition: opacity 0.35s ease;
     }
-
     .preset-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 0.75rem 1rem;
-      cursor: pointer;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 11px; padding: 0.75rem 1rem;
+      cursor: pointer; text-align: left; position: relative; overflow: hidden;
       transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-      animation: card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: card-in 0.4s cubic-bezier(0.16,1,0.3,1) both;
     }
-
     .preset-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(135deg, var(--orange-dim) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.2s;
+      opacity: 0; transition: opacity 0.2s;
     }
-
     .preset-card:nth-child(1) { animation-delay: 0.06s; }
     .preset-card:nth-child(2) { animation-delay: 0.12s; }
     .preset-card:nth-child(3) { animation-delay: 0.18s; }
     .preset-card:nth-child(4) { animation-delay: 0.24s; }
-
     @keyframes card-in {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .preset-card:hover {
-      border-color: var(--border-lit);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 24px #00000050;
-    }
-
+    .preset-card:hover { border-color: var(--border-lit); transform: translateY(-1px); box-shadow: 0 6px 24px #00000050; }
     .preset-card:hover::before { opacity: 1; }
     .preset-card:active { transform: translateY(0); }
-
-    .preset-arrow {
-      position: absolute;
-      top: 0.65rem; right: 0.75rem;
-      color: var(--orange);
-      opacity: 0;
-      font-size: 0.75rem;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .preset-card:hover .preset-arrow { opacity: 1; transform: translate(2px, -2px); }
-
-    .preset-text {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      font-weight: 400;
-      line-height: 1.45;
-      position: relative;
-      z-index: 1;
-      transition: color 0.2s;
-    }
-
+    .preset-arrow { position: absolute; top: 0.65rem; right: 0.75rem; color: var(--orange); opacity: 0; font-size: 0.75rem; transition: opacity 0.2s, transform 0.2s; }
+    .preset-card:hover .preset-arrow { opacity: 1; transform: translate(2px,-2px); }
+    .preset-text { font-size: 0.82rem; color: var(--text-dim); font-weight: 400; line-height: 1.45; position: relative; z-index: 1; transition: color 0.2s; }
     .preset-card:hover .preset-text { color: var(--text); }
 
     /* ── Chat messages ── */
     .chat-messages {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: 1rem 0 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
     }
-
     .chat-messages::-webkit-scrollbar { width: 4px; }
     .chat-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
     .chat-messages.hidden { display: none; }
 
-    /* ── Message wrapper ── */
+    /* ── Message layout ── */
     .message {
-      display: flex;
-      gap: 0.7rem;
-      animation: slide-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
-      max-width: 82%;
-      position: relative;
+      display: flex; gap: 0.7rem;
+      animation: slide-in 0.28s cubic-bezier(0.16,1,0.3,1) both;
+      max-width: 82%; position: relative;
     }
-
     @keyframes slide-in {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .message.user-message  { align-self: flex-end; flex-direction: row-reverse; }
+    .message.user-message { align-self: flex-end; flex-direction: row-reverse; }
     .message.assistant-message { align-self: flex-start; }
 
-    /* Pseudo avatars */
+    /* Avatars via pseudo-elements — do NOT touch the p inside */
     .message::before {
       content: '◎';
       width: 30px; height: 30px; min-width: 30px;
       border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-      margin-top: 3px;
+      font-size: 0.75rem; flex-shrink: 0; margin-top: 3px;
       background: linear-gradient(135deg, var(--orange), #e5601b);
-      box-shadow: 0 0 12px var(--orange-glow);
-      color: white;
+      box-shadow: 0 0 12px var(--orange-glow); color: white;
     }
-
     .message.assistant-message::before {
       content: '✦';
-      background: var(--surface3);
-      border: 1px solid var(--border-lit);
-      box-shadow: none;
-      color: var(--text-muted);
+      background: var(--surface3); border: 1px solid var(--border-lit);
+      box-shadow: none; color: var(--text-muted);
     }
 
-    /* Message bubble */
-    .message > p,
-    .message > div.bubble {
+    /* The <p> that chat.js writes to — we style it as the bubble */
+    .message > p {
       padding: 0.8rem 1rem;
       border-radius: var(--radius);
-      font-size: 0.9rem;
-      line-height: 1.7;
-      flex: 1;
-      min-width: 0;
+      font-size: 0.9rem; line-height: 1.7;
+      flex: 1; min-width: 0;
+      /* white-space: pre-line for user, overridden for assistant after render */
     }
-
-    .user-message > p,
-    .user-message > div.bubble {
+    .user-message > p {
       background: var(--user-bg);
       border: 1px solid var(--border-lit);
       border-bottom-right-radius: 4px;
-      white-space: pre-line;
-      overflow-wrap: anywhere;
+      white-space: pre-line; overflow-wrap: anywhere;
     }
-
-    .assistant-message > p,
-    .assistant-message > div.bubble {
+    .assistant-message > p {
       background: var(--ai-bg);
       border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
+      white-space: pre-line; /* keeps readable during streaming */
     }
 
-    /* ── Message actions (copy buttons) ── */
+    /* After markdown is rendered, p gets .md-rendered class */
+    .assistant-message > p.md-rendered { white-space: normal; }
+
+    /* ── Markdown styles inside rendered p ── */
+    .md-rendered p { margin-bottom: 0.55em; }
+    .md-rendered p:last-child { margin-bottom: 0; }
+    .md-rendered strong { font-weight: 600; color: var(--text); }
+    .md-rendered em { font-style: italic; color: var(--text-dim); }
+    .md-rendered h1, .md-rendered h2, .md-rendered h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text);
+      margin: 0.85em 0 0.35em; line-height: 1.3;
+    }
+    .md-rendered h1 { font-size: 1.1rem; }
+    .md-rendered h2 { font-size: 1rem; }
+    .md-rendered h3 { font-size: 0.93rem; }
+    .md-rendered h1:first-child, .md-rendered h2:first-child, .md-rendered h3:first-child { margin-top: 0; }
+    .md-rendered ul, .md-rendered ol { padding-left: 1.3em; margin: 0.35em 0 0.55em; }
+    .md-rendered li { margin-bottom: 0.2em; }
+    .md-rendered li::marker { color: var(--orange); }
+    .md-rendered blockquote {
+      border-left: 3px solid var(--border-lit); padding: 0.4em 0.8em;
+      margin: 0.5em 0; color: var(--text-dim);
+      background: var(--surface3); border-radius: 0 6px 6px 0;
+    }
+    .md-rendered hr { border: none; border-top: 1px solid var(--border-mid); margin: 0.75em 0; }
+    .md-rendered a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+    .md-rendered code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8em;
+      background: var(--code-bg); border: 1px solid var(--border-mid);
+      padding: 0.15em 0.4em; border-radius: 4px; color: #f9a86b;
+    }
+
+    /* ── Code blocks ── */
+    .code-block {
+      margin: 0.6em 0; border-radius: 10px;
+      overflow: hidden; border: 1px solid var(--border-mid);
+      background: var(--code-bg);
+    }
+    .code-block:last-child { margin-bottom: 0; }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0.8rem; background: #0a0a12;
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.05em; }
+    .code-copy-btn {
+      display: flex; align-items: center; gap: 0.3rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 5px; color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif; font-size: 0.68rem;
+      padding: 0.2rem 0.5rem; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .code-copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
+    .code-copy-btn.copied { color: #4ade80; border-color: #4ade8033; }
+    .code-copy-btn svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .code-block pre { margin: 0; padding: 0.85rem 1rem; overflow-x: auto; scrollbar-width: thin; }
+    .code-block pre code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+      line-height: 1.65; color: #c9c0d3; background: none; border: none; padding: 0; white-space: pre;
+    }
+
+    /* ── Message action buttons (copy) ── */
     .msg-actions {
-      display: flex;
-      gap: 0.3rem;
-      margin-top: 0.3rem;
-      opacity: 0;
-      transition: opacity 0.15s;
-      justify-content: flex-start;
+      display: flex; gap: 0.3rem; margin-top: 0.25rem;
+      opacity: 0; transition: opacity 0.15s;
       padding-left: calc(30px + 0.7rem);
     }
-
-    .message.user-message + .msg-actions { justify-content: flex-end; padding-left: 0; padding-right: calc(30px + 0.7rem); }
-    .message:hover + .msg-actions,
-    .msg-actions:hover { opacity: 1; }
+    .message.user-message ~ .msg-actions { justify-content: flex-end; padding-left: 0; padding-right: calc(30px + 0.7rem); }
+    .message:hover ~ .msg-actions, .msg-actions:hover { opacity: 1 !important; }
 
     .msg-action-btn {
       display: flex; align-items: center; gap: 0.3rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.55rem;
-      cursor: pointer;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif; font-size: 0.7rem;
+      padding: 0.25rem 0.55rem; cursor: pointer;
       transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
-
     .msg-action-btn:hover { color: var(--text); border-color: var(--border-mid); background: var(--surface3); }
     .msg-action-btn.copied { color: #4ade80; border-color: #4ade8033; }
-
-    .msg-action-btn svg {
-      width: 11px; height: 11px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    /* ── Markdown rendering inside assistant bubbles ── */
-    .md-content { font-size: 0.9rem; line-height: 1.7; }
-
-    .md-content p { margin-bottom: 0.6em; }
-    .md-content p:last-child { margin-bottom: 0; }
-
-    .md-content strong { font-weight: 600; color: var(--text); }
-    .md-content em { font-style: italic; color: var(--text-dim); }
-    .md-content u { text-decoration: underline; text-underline-offset: 3px; }
-
-    .md-content h1, .md-content h2, .md-content h3, .md-content h4 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      color: var(--text);
-      margin: 0.9em 0 0.4em;
-      line-height: 1.3;
-    }
-    .md-content h1 { font-size: 1.1rem; }
-    .md-content h2 { font-size: 1rem; }
-    .md-content h3 { font-size: 0.93rem; }
-    .md-content h1:first-child,
-    .md-content h2:first-child,
-    .md-content h3:first-child { margin-top: 0; }
-
-    .md-content ul, .md-content ol {
-      padding-left: 1.3em;
-      margin: 0.4em 0 0.6em;
-    }
-
-    .md-content li { margin-bottom: 0.25em; }
-    .md-content li::marker { color: var(--orange); }
-
-    .md-content blockquote {
-      border-left: 3px solid var(--border-lit);
-      padding: 0.4em 0.8em;
-      margin: 0.6em 0;
-      color: var(--text-dim);
-      background: var(--surface3);
-      border-radius: 0 6px 6px 0;
-    }
-
-    .md-content hr {
-      border: none;
-      border-top: 1px solid var(--border-mid);
-      margin: 0.8em 0;
-    }
-
-    .md-content a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
-
-    /* Inline code */
-    .md-content code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8em;
-      background: var(--code-bg);
-      border: 1px solid var(--border-mid);
-      padding: 0.15em 0.45em;
-      border-radius: 4px;
-      color: #f9a86b;
-    }
-
-    /* Code blocks */
-    .code-block {
-      margin: 0.7em 0;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border-mid);
-      background: var(--code-bg);
-    }
-
-    .code-block:last-child { margin-bottom: 0; }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.45rem 0.85rem;
-      background: #0a0a12;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .code-lang {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-      text-transform: lowercase;
-    }
-
-    .code-copy-btn {
-      display: flex; align-items: center; gap: 0.3rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      color: var(--text-muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.68rem;
-      padding: 0.2rem 0.5rem;
-      cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-    }
-
-    .code-copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
-    .code-copy-btn.copied { color: #4ade80; border-color: #4ade8033; }
-
-    .code-copy-btn svg {
-      width: 10px; height: 10px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-
-    .code-block pre {
-      margin: 0;
-      padding: 0.85rem 1rem;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-mid) transparent;
-    }
-
-    .code-block pre code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.65;
-      color: #c9c0d3;
-      background: none;
-      border: none;
-      padding: 0;
-      white-space: pre;
-    }
+    .msg-action-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     /* ── /commands panel ── */
     .commands-panel {
-      background: var(--surface2);
-      border: 1px solid var(--border-mid);
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 0.5rem 0;
+      background: var(--surface2); border: 1px solid var(--border-mid);
+      border-radius: 12px; overflow: hidden;
+      margin: 0.25rem 0; align-self: flex-start; width: 100%; max-width: 480px;
       animation: slide-in 0.25s ease both;
     }
-
     .commands-header {
-      padding: 0.7rem 1rem;
-      background: var(--surface3);
+      padding: 0.65rem 1rem; background: var(--surface3);
       border-bottom: 1px solid var(--border);
-      font-family: 'Syne', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      letter-spacing: 0.04em;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+      color: var(--text-dim); letter-spacing: 0.04em;
     }
-
     .commands-header span { color: var(--orange); }
-
     .command-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.6rem 1rem;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.15s;
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.55rem 1rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s;
     }
-
     .command-item:last-child { border-bottom: none; }
     .command-item:hover { background: var(--surface3); }
-
-    .command-name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--orange);
-      min-width: 120px;
-      flex-shrink: 0;
-    }
-
-    .command-desc {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
+    .command-name { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--orange); min-width: 110px; flex-shrink: 0; }
+    .command-desc { font-size: 0.79rem; color: var(--text-muted); }
 
     /* ── Typing indicator ── */
     .typing-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0 0 0.4rem;
+      display: none; align-items: center; gap: 0.7rem; padding: 0 0 0.4rem;
     }
-
     .typing-indicator.visible { display: flex; }
-
     .typing-indicator::before {
       content: '✦';
-      width: 30px; height: 30px; min-width: 30px;
-      border-radius: 9px;
-      background: var(--surface3);
-      border: 1px solid var(--border-lit);
+      width: 30px; height: 30px; min-width: 30px; border-radius: 9px;
+      background: var(--surface3); border: 1px solid var(--border-lit);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; flex-shrink: 0;
-      color: var(--text-muted);
+      font-size: 0.75rem; flex-shrink: 0; color: var(--text-muted);
     }
-
     .typing-dots {
       display: flex; align-items: center; gap: 5px;
-      background: var(--ai-bg);
-      border: 1px solid var(--border);
-      padding: 0.7rem 0.9rem;
-      border-radius: var(--radius);
-      border-bottom-left-radius: 4px;
+      background: var(--ai-bg); border: 1px solid var(--border);
+      padding: 0.7rem 0.9rem; border-radius: var(--radius); border-bottom-left-radius: 4px;
     }
-
     .typing-dots span {
-      width: 6px; height: 6px;
-      background: var(--text-muted);
-      border-radius: 50%;
-      display: inline-block;
+      width: 6px; height: 6px; background: var(--text-muted);
+      border-radius: 50%; display: inline-block;
       animation: bounce 1.2s ease-in-out infinite;
     }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
     @keyframes bounce {
       0%, 80%, 100% { transform: scale(1); opacity: 0.35; }
       40% { transform: scale(1.25); opacity: 1; }
     }
 
     /* ── Input area ── */
-    .message-input-area {
-      padding: 0.65rem 0 0;
-      flex-shrink: 0;
-    }
-
+    .message-input-area { padding: 0.65rem 0 0; flex-shrink: 0; }
     .input-wrapper {
-      display: flex;
-      align-items: flex-end;
-      gap: 0.55rem;
-      background: var(--surface2);
-      border: 1px solid var(--border-mid);
-      border-radius: 13px;
-      padding: 0.55rem 0.55rem 0.55rem 1rem;
+      display: flex; align-items: flex-end; gap: 0.55rem;
+      background: var(--surface2); border: 1px solid var(--border-mid);
+      border-radius: 13px; padding: 0.55rem 0.55rem 0.55rem 1rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
-    .input-wrapper:focus-within {
-      border-color: var(--border-lit);
-      box-shadow: 0 0 0 3px var(--orange-dim);
-    }
-
+    .input-wrapper:focus-within { border-color: var(--border-lit); box-shadow: 0 0 0 3px var(--orange-dim); }
     #user-input {
-      flex: 1;
-      background: transparent;
-      border: none; outline: none;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
       font-size: 0.91rem; font-weight: 400; line-height: 1.6;
-      resize: none;
-      min-height: 26px; max-height: 150px;
-      overflow-y: auto; scrollbar-width: thin;
-      caret-color: var(--orange);
+      resize: none; min-height: 26px; max-height: 150px;
+      overflow-y: auto; scrollbar-width: thin; caret-color: var(--orange);
     }
-
     #user-input::placeholder { color: var(--text-muted); }
     #user-input:disabled { opacity: 0.45; }
-
     #send-button {
       width: 36px; height: 36px; flex-shrink: 0;
       background: linear-gradient(135deg, var(--orange), #d96818);
-      color: white; border: none;
-      border-radius: 9px; cursor: pointer;
+      color: white; border: none; border-radius: 9px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s;
       box-shadow: 0 0 14px var(--orange-glow);
     }
-
     #send-button:hover { transform: scale(1.07); box-shadow: 0 0 22px var(--orange-glow); }
     #send-button:active { transform: scale(0.96); }
     #send-button:disabled { background: var(--surface3); box-shadow: none; cursor: not-allowed; opacity: 0.4; }
-
-    #send-button svg {
-      width: 15px; height: 15px;
-      fill: none; stroke: currentColor;
-      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
-      transition: transform 0.2s;
-    }
-
+    #send-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s; }
     #send-button:hover:not(:disabled) svg { transform: translateX(1px) translateY(-1px); }
 
-    /* ── Disclaimer ── */
     .disclaimer {
       display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-      margin-top: 0.5rem;
-      font-size: 0.67rem; color: var(--text-muted);
+      margin-top: 0.5rem; font-size: 0.67rem; color: var(--text-muted);
       letter-spacing: 0.02em; opacity: 0.6;
     }
+    .disclaimer svg { width: 10px; height: 10px; flex-shrink: 0; opacity: 0.5; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .disclaimer svg {
-      width: 10px; height: 10px; flex-shrink: 0; opacity: 0.5;
-      fill: none; stroke: currentColor; stroke-width: 2;
-      stroke-linecap: round; stroke-linejoin: round;
-    }
+    footer { text-align: center; font-size: 0.65rem; color: #25232f; padding: 0.35rem 1rem 0.6rem; flex-shrink: 0; letter-spacing: 0.04em; z-index: 1; }
 
-    footer {
-      text-align: center; font-size: 0.65rem; color: #25232f;
-      padding: 0.35rem 1rem 0.6rem;
-      flex-shrink: 0; letter-spacing: 0.04em; z-index: 1;
-    }
-
-    /* ── Confirm toast ── */
     .confirm-toast {
       position: fixed; top: 1rem; left: 50%;
       transform: translateX(-50%) translateY(-8px);
-      background: var(--surface2);
-      border: 1px solid #e5534b44;
-      border-radius: 10px;
-      padding: 0.55rem 0.9rem;
+      background: var(--surface2); border: 1px solid #e5534b44;
+      border-radius: 10px; padding: 0.55rem 0.9rem;
       display: flex; align-items: center; gap: 0.7rem;
-      font-size: 0.78rem; color: var(--text);
-      z-index: 200; opacity: 0; pointer-events: none;
+      font-size: 0.78rem; color: var(--text); z-index: 200;
+      opacity: 0; pointer-events: none;
       transition: opacity 0.2s, transform 0.2s;
       white-space: nowrap; box-shadow: 0 8px 32px #00000060;
     }
-
     .confirm-toast.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
-
-    .confirm-toast button {
-      font-family: 'DM Sans', sans-serif; font-size: 0.76rem;
-      padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; border: none;
-    }
-
+    .confirm-toast button { font-family: 'DM Sans', sans-serif; font-size: 0.76rem; padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; border: none; }
     .confirm-toast .btn-confirm { background: #e5534b; color: white; }
     .confirm-toast .btn-cancel { background: transparent; border: 1px solid var(--border-mid) !important; color: var(--text-muted); }
-
-    /* ── Scrollbar ── */
-    .chat-messages::-webkit-scrollbar-track { background: transparent; }
 
     @media (max-width: 520px) {
       .preset-grid { grid-template-columns: 1fr; }
@@ -722,7 +424,6 @@
 </head>
 <body>
 
-<!-- Top bar -->
 <div class="top-bar" id="top-bar">
   <span class="top-bar-title">Ben</span>
   <div class="top-bar-actions">
@@ -734,8 +435,6 @@
 </div>
 
 <div class="chat-container">
-
-  <!-- Welcome screen -->
   <div class="welcome-screen" id="welcome-screen">
     <div class="welcome-text">
       <h2>Hey, I'm Ben.</h2>
@@ -745,17 +444,14 @@
     <div class="preset-grid" id="preset-grid"></div>
   </div>
 
-  <!-- Messages -->
   <div id="chat-messages" class="chat-messages hidden"></div>
 
-  <!-- Typing indicator -->
   <div class="typing-indicator" id="typing-indicator">
     <div class="typing-dots">
       <span></span><span></span><span></span>
     </div>
   </div>
 
-  <!-- Input -->
   <div class="message-input-area">
     <div class="input-wrapper">
       <textarea id="user-input" placeholder="Ask Ben anything… or type / for commands" rows="1" autofocus></textarea>
@@ -778,89 +474,88 @@
   <button class="btn-cancel" id="confirm-no">Cancel</button>
 </div>
 
+<!-- chat.js MUST load first — owns #user-input, #send-button, #chat-messages, #typing-indicator -->
 <script src="chat.js"></script>
 
 <script>
-  // ── Config ──
   const STORAGE_KEY = 'ben_chat_history';
 
-  // ── DOM refs ──
-  const welcomeScreen = document.getElementById('welcome-screen');
+  const welcomeScreen  = document.getElementById('welcome-screen');
   const chatMessagesEl = document.getElementById('chat-messages');
-  const topBar = document.getElementById('top-bar');
-  const presetGrid = document.getElementById('preset-grid');
-  const userInputEl = document.getElementById('user-input');
-  const toast = document.getElementById('confirm-toast');
+  const topBar         = document.getElementById('top-bar');
+  const presetGrid     = document.getElementById('preset-grid');
+  const userInputEl    = document.getElementById('user-input');
+  const toast          = document.getElementById('confirm-toast');
 
-  // ── Configure marked.js ──
+  // ── marked config ──
   if (typeof marked !== 'undefined') {
-    marked.setOptions({
-      breaks: true,
-      gfm: true,
-    });
+    marked.setOptions({ breaks: true, gfm: true });
   }
 
-  // ── Parse markdown + build code blocks ──
-  function renderMarkdown(text) {
-    if (typeof marked === 'undefined') return `<p>${text}</p>`;
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
-    // Parse markdown
-    let html = marked.parse(text);
+  // ── Build a code block element ──
+  function buildCodeBlock(lang, rawCode) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    wrapper.innerHTML = `
+      <div class="code-header">
+        <span class="code-lang">${lang || 'code'}</span>
+        <button class="code-copy-btn">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code>${escapeHtml(rawCode)}</code></pre>
+    `;
+    wrapper.querySelector('.code-copy-btn').addEventListener('click', function() {
+      navigator.clipboard.writeText(rawCode).then(() => {
+        this.classList.add('copied');
+        this.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+        setTimeout(() => {
+          this.classList.remove('copied');
+          this.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
+        }, 2000);
+      });
+    });
+    return wrapper;
+  }
 
-    // Wrap <pre><code> blocks with our custom code-block UI
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
+  // ── Apply markdown to a <p> element after streaming finishes ──
+  // CRITICAL: we do NOT replace the <p> — we inject rendered HTML inside it
+  function applyMarkdown(pEl) {
+    if (typeof marked === 'undefined') return;
+    const raw = pEl.textContent;
+    if (!raw.trim()) return;
 
-    tmp.querySelectorAll('pre').forEach(pre => {
+    // Parse to HTML string
+    let html = marked.parse(raw);
+
+    // Set the inner HTML (replaces text content with rendered markdown)
+    pEl.innerHTML = html;
+    pEl.classList.add('md-rendered');
+
+    // Now find <pre><code> blocks and replace with our styled versions
+    pEl.querySelectorAll('pre').forEach(pre => {
       const codeEl = pre.querySelector('code');
       if (!codeEl) return;
-
-      // Detect language from class like "language-javascript"
       const langClass = [...codeEl.classList].find(c => c.startsWith('language-'));
-      const lang = langClass ? langClass.replace('language-', '') : 'code';
+      const lang = langClass ? langClass.replace('language-', '') : '';
       const rawCode = codeEl.textContent;
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'code-block';
-      wrapper.innerHTML = `
-        <div class="code-header">
-          <span class="code-lang">${lang}</span>
-          <button class="code-copy-btn" data-code>
-            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            Copy
-          </button>
-        </div>
-        <pre><code>${escapeHtml(rawCode)}</code></pre>
-      `;
-
-      wrapper.querySelector('.code-copy-btn').addEventListener('click', function() {
-        navigator.clipboard.writeText(rawCode).then(() => {
-          this.classList.add('copied');
-          this.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
-          setTimeout(() => {
-            this.classList.remove('copied');
-            this.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
-          }, 2000);
-        });
-      });
-
-      pre.replaceWith(wrapper);
+      const block = buildCodeBlock(lang, rawCode);
+      pre.replaceWith(block);
     });
-
-    return tmp.innerHTML;
   }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── Copy button helper ──
-  function makeCopyBtn(getText) {
+  // ── Copy button ──
+  function makeCopyBtn(getTextFn) {
     const btn = document.createElement('button');
     btn.className = 'msg-action-btn';
     btn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
     btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(getText()).then(() => {
+      navigator.clipboard.writeText(getTextFn()).then(() => {
         btn.classList.add('copied');
         btn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
         setTimeout(() => {
@@ -872,58 +567,28 @@
     return btn;
   }
 
-  // ── Add action buttons below a message ──
-  function attachActions(msgEl, isUser) {
+  // ── Attach action bar below a message ──
+  function attachActions(msgEl) {
+    const isUser = msgEl.classList.contains('user-message');
     const actions = document.createElement('div');
     actions.className = 'msg-actions';
-    if (isUser) msgEl.classList.add('user-message-parent');
 
-    const copyBtn = makeCopyBtn(() => {
-      const bubble = msgEl.querySelector('.bubble, p');
-      return bubble ? (bubble.innerText || bubble.textContent) : '';
-    });
+    const copyBtn = makeCopyBtn(() => msgEl.querySelector('p')?.innerText || '');
     actions.appendChild(copyBtn);
+    msgEl.after(actions);
 
-    msgEl.insertAdjacentElement('afterend', actions);
-
-    // Keep actions visible when hovering message OR actions
+    // Show on message hover
     msgEl.addEventListener('mouseenter', () => actions.style.opacity = '1');
-    msgEl.addEventListener('mouseleave', () => {
-      if (!actions.matches(':hover')) actions.style.opacity = '0';
-    });
+    msgEl.addEventListener('mouseleave', () => { if (!actions.matches(':hover')) actions.style.opacity = '0'; });
     actions.addEventListener('mouseleave', () => actions.style.opacity = '0');
   }
 
-  // ── Upgrade a bare message element (from chat.js) ──
-  // Wraps p content in a .bubble div and applies markdown for assistant messages
-  function upgradeMessageEl(el, isStreaming) {
-    const p = el.querySelector('p');
-    if (!p) return;
-
-    const isUser = el.classList.contains('user-message');
-
-    if (isUser) {
-      // User messages: keep as-is but wrap in bubble
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.style.whiteSpace = 'pre-line';
-      bubble.style.overflowWrap = 'anywhere';
-      bubble.textContent = p.textContent;
-      p.replaceWith(bubble);
-    } else {
-      // Assistant messages: render markdown
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble md-content';
-      if (!isStreaming) {
-        bubble.innerHTML = renderMarkdown(p.textContent);
-      } else {
-        // During streaming, store raw text and re-render periodically
-        bubble._rawText = '';
-        bubble.innerHTML = '';
-      }
-      el._bubbleEl = bubble;
-      el._rawText = p.textContent;
-      p.replaceWith(bubble);
+  // ── Show/hide chat vs welcome ──
+  function showChat() {
+    if (!welcomeScreen.classList.contains('hidden')) {
+      welcomeScreen.classList.add('hidden');
+      chatMessagesEl.classList.remove('hidden');
+      topBar.classList.add('visible');
     }
   }
 
@@ -932,60 +597,33 @@
     { name: '/help',    desc: 'Show all available commands' },
     { name: '/clear',   desc: 'Clear the chat history' },
     { name: '/ideas',   desc: 'Get creative project ideas' },
-    { name: '/explain', desc: 'Ask Ben to explain a concept simply' },
+    { name: '/explain', desc: 'Ask Ben to explain something simply' },
     { name: '/write',   desc: 'Start a writing task' },
     { name: '/code',    desc: 'Get help with code' },
     { name: '/summary', desc: 'Summarise a topic or text' },
-    { name: '/bullet',  desc: 'Get a bullet-point breakdown of something' },
+    { name: '/bullet',  desc: 'Get a bullet-point breakdown' },
   ];
 
   function showCommandsPanel() {
-    // Remove existing panel if any
-    const existing = chatMessagesEl.querySelector('.commands-panel');
-    if (existing) existing.remove();
-
     showChat();
+    // Remove existing panel
+    chatMessagesEl.querySelector('.commands-panel')?.remove();
 
     const panel = document.createElement('div');
-    panel.className = 'commands-panel message assistant-message';
-    panel.style.maxWidth = '100%';
-    panel.style.alignSelf = 'stretch';
+    panel.className = 'commands-panel';
     panel.innerHTML = `
-      <div class="commands-header">
-        <span>/ </span>Commands
-      </div>
+      <div class="commands-header"><span>/</span> Commands</div>
       ${COMMANDS.map(c => `
         <div class="command-item" data-cmd="${c.name}">
           <span class="command-name">${c.name}</span>
           <span class="command-desc">${c.desc}</span>
-        </div>
-      `).join('')}
+        </div>`).join('')}
     `;
-
     panel.querySelectorAll('.command-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const cmd = item.dataset.cmd;
-        panel.remove();
-        handleCommand(cmd);
-      });
+      item.addEventListener('click', () => { panel.remove(); handleCommand(item.dataset.cmd); });
     });
-
     chatMessagesEl.appendChild(panel);
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-  }
-
-  function handleCommand(cmd) {
-    const cmdMap = {
-      '/help':    () => showCommandsPanel(),
-      '/clear':   () => { toast.classList.add('show'); },
-      '/ideas':   () => sendPreset('Give me 5 creative project ideas for a weekend'),
-      '/explain': () => { userInputEl.value = 'Explain: '; userInputEl.focus(); },
-      '/write':   () => { userInputEl.value = 'Help me write: '; userInputEl.focus(); },
-      '/code':    () => { userInputEl.value = 'Help me with this code: '; userInputEl.focus(); },
-      '/summary': () => { userInputEl.value = 'Summarise: '; userInputEl.focus(); },
-      '/bullet':  () => { userInputEl.value = 'Give me a bullet-point breakdown of: '; userInputEl.focus(); },
-    };
-    if (cmdMap[cmd]) cmdMap[cmd]();
   }
 
   function sendPreset(text) {
@@ -995,29 +633,35 @@
     document.getElementById('send-button').click();
   }
 
-  // ── Intercept user input for /commands ──
-  // We patch into the keydown event — if Enter is pressed with /command, intercept
+  function handleCommand(cmd) {
+    const map = {
+      '/help':    () => showCommandsPanel(),
+      '/clear':   () => toast.classList.add('show'),
+      '/ideas':   () => sendPreset('Give me 5 creative project ideas for a weekend'),
+      '/explain': () => { userInputEl.value = 'Explain: '; userInputEl.focus(); },
+      '/write':   () => { userInputEl.value = 'Help me write: '; userInputEl.focus(); },
+      '/code':    () => { userInputEl.value = 'Help me with this code: '; userInputEl.focus(); },
+      '/summary': () => { userInputEl.value = 'Summarise: '; userInputEl.focus(); },
+      '/bullet':  () => { userInputEl.value = 'Give me a bullet-point breakdown of: '; userInputEl.focus(); },
+    };
+    if (map[cmd]) map[cmd]();
+    else showCommandsPanel();
+  }
+
+  // Intercept Enter on /commands before chat.js handles it
   userInputEl.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       const val = this.value.trim();
       if (val.startsWith('/')) {
         e.preventDefault();
-        e.stopImmediatePropagation(); // prevent chat.js from sending
+        e.stopImmediatePropagation();
         const cmd = val.split(' ')[0].toLowerCase();
-        if (COMMANDS.find(c => c.name === cmd)) {
-          this.value = '';
-          this.style.height = 'auto';
-          handleCommand(cmd);
-        } else {
-          // Unknown command — show panel
-          this.value = '';
-          this.style.height = 'auto';
-          showCommandsPanel();
-        }
-        return false;
+        this.value = '';
+        this.style.height = 'auto';
+        handleCommand(cmd);
       }
     }
-  }, true); // capture phase so we run before chat.js
+  }, true); // capture = runs before chat.js listener
 
   // ── Preset questions ──
   const ALL_PRESETS = [
@@ -1035,9 +679,7 @@
     { text: 'Summarise the key ideas behind stoicism' },
   ];
 
-  function pickPresets() {
-    return [...ALL_PRESETS].sort(() => Math.random() - 0.5).slice(0, 4);
-  }
+  function pickPresets() { return [...ALL_PRESETS].sort(() => Math.random() - 0.5).slice(0, 4); }
 
   function renderPresets(presets) {
     presetGrid.innerHTML = '';
@@ -1052,143 +694,104 @@
   }
 
   renderPresets(pickPresets());
-
   setInterval(() => {
     if (welcomeScreen.classList.contains('hidden')) return;
     presetGrid.style.opacity = '0';
     setTimeout(() => { renderPresets(pickPresets()); presetGrid.style.opacity = '1'; }, 380);
   }, 20000);
 
-  // ── Show chat ──
-  function showChat() {
-    if (!welcomeScreen.classList.contains('hidden')) {
-      welcomeScreen.classList.add('hidden');
-      chatMessagesEl.classList.remove('hidden');
-      topBar.classList.add('visible');
-    }
-  }
-
   // ── localStorage ──
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
   }
-
   function clearStorage() { localStorage.removeItem(STORAGE_KEY); }
 
-  // ── Restore saved history ──
+  // ── Restore history ──
   function restoreHistory() {
     const saved = loadHistory();
     if (!saved.length) return;
-
     showChat();
-
     if (typeof chatHistory !== 'undefined') {
       chatHistory.length = 0;
       saved.forEach(({ role, text }) => chatHistory.push({ role, content: text }));
     }
-
     saved.forEach(({ role, text }) => {
       const el = document.createElement('div');
       el.className = `message ${role}-message`;
       el.style.animation = 'none';
-      el.innerHTML = `<p>${text}</p>`;
-      upgradeMessageEl(el, false);
+      const p = document.createElement('p');
+      p.textContent = text;
+      el.appendChild(p);
+      if (role === 'assistant') applyMarkdown(p);
       chatMessagesEl.appendChild(el);
-      attachActions(el, role === 'user');
+      attachActions(el);
     });
-
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }
 
-  // ── MutationObserver: intercept messages from chat.js ──
+  // ── MutationObserver: watch for new messages from chat.js ──
+  // KEY RULE: we NEVER touch or replace the <p> while chat.js is streaming.
+  // We only apply markdown AFTER streaming is done (detected via 900ms idle).
+  const seenMessages = new WeakSet();
+
   const observer = new MutationObserver(mutations => {
     for (const m of mutations) {
       for (const node of m.addedNodes) {
-        if (node.nodeType !== 1 || !node.classList.contains('message')) continue;
-        // Skip commands panel which we added ourselves
+        if (node.nodeType !== 1) continue;
+        if (!node.classList.contains('message')) continue;
         if (node.classList.contains('commands-panel')) continue;
+        if (seenMessages.has(node)) continue;
+        seenMessages.add(node);
 
         showChat();
         const isUser = node.classList.contains('user-message');
 
         if (isUser) {
-          // User message: upgrade immediately
-          upgradeMessageEl(node, false);
-          attachActions(node, true);
+          // User messages: no streaming, safe to act immediately
+          attachActions(node);
+          // Save to localStorage
+          setTimeout(() => {
+            const text = node.querySelector('p')?.textContent || '';
+            if (text) {
+              const h = loadHistory();
+              h.push({ role: 'user', text });
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
+            }
+          }, 0);
 
-          const text = node.querySelector('.bubble, p')?.textContent || '';
-          if (text) {
-            const h = loadHistory();
-            h.push({ role: 'user', text });
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
-          }
         } else {
-          // Assistant message: streaming — upgrade with empty bubble, then watch for text
-          upgradeMessageEl(node, true);
-          attachActions(node, false);
+          // Assistant messages: chat.js streams text into the <p>
+          // DO NOT TOUCH the <p> until streaming is done
+          attachActions(node);
 
-          const bubble = node._bubbleEl;
-          if (!bubble) continue;
+          let idleTimer = null;
 
-          // The original <p> was replaced. But chat.js still holds a reference to it
-          // via assistantTextEl. We need to intercept textContent assignments.
-          // Strategy: poll for text changes and re-render markdown incrementally.
-          let lastText = '';
-          let saveTimer = null;
-          let renderTimer = null;
+          const streamWatcher = new MutationObserver(() => {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+              // 900ms with no changes = streaming finished
+              streamWatcher.disconnect();
+              const p = node.querySelector('p');
+              if (!p) return;
+              const finalText = p.textContent || '';
 
-          const checkText = () => {
-            // chat.js writes to its own p element ref — we need to find updated text.
-            // Since we replaced p with bubble, chat.js's ref is now detached.
-            // We solve this by patching chat.js's assistantTextEl indirectly:
-            // chat.js appends the message, then sets textContent on the p.
-            // We intercept via a MutationObserver on the parent.
-          };
+              // NOW safe to render markdown (mutates p.innerHTML)
+              applyMarkdown(p);
 
-          // Since bubble replaced the original p that chat.js holds a ref to,
-          // chat.js will keep writing to the detached p. We need to bridge the gap.
-          // Solution: create a hidden sink p that chat.js writes to, mirror to bubble.
-          const sinkP = document.createElement('p');
-          sinkP.style.display = 'none';
-          node.appendChild(sinkP);
-
-          // Override the p that chat.js cached (assistantTextEl) — not possible directly,
-          // so instead we watch sinkP AND directly observe via a proxy approach.
-          // Actually the simplest fix: observe all text changes in the node itself.
-          const streamObserver = new MutationObserver(() => {
-            // Find any p element in the node that has text (might be sinkP or original)
-            const allP = node.querySelectorAll('p');
-            let rawText = '';
-            allP.forEach(p => { if (p.textContent) rawText += p.textContent; });
-
-            if (rawText === lastText) return;
-            lastText = rawText;
-            bubble._rawText = rawText;
-
-            // Throttle re-render during streaming (every 80ms max)
-            clearTimeout(renderTimer);
-            renderTimer = setTimeout(() => {
-              bubble.innerHTML = renderMarkdown(rawText);
-            }, 80);
-
-            // Save after streaming stops (800ms of no changes)
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => {
-              const finalText = rawText;
+              // Save to localStorage
               if (finalText) {
                 const h = loadHistory();
                 h.push({ role: 'assistant', text: finalText });
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
               }
-              streamObserver.disconnect();
-              // Final render
-              bubble.innerHTML = renderMarkdown(finalText);
+
               chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
             }, 900);
           });
 
-          streamObserver.observe(node, { childList: true, characterData: true, subtree: true });
+          // Watch the message element for any text changes (chat.js writes to p.textContent)
+          streamWatcher.observe(node, { childList: true, subtree: true, characterData: true });
         }
       }
     }
@@ -1198,7 +801,6 @@
 
   // ── Delete chat ──
   document.getElementById('delete-btn').addEventListener('click', () => toast.classList.add('show'));
-
   document.getElementById('confirm-yes').addEventListener('click', () => {
     toast.classList.remove('show');
     clearStorage();
@@ -1214,7 +816,6 @@
       chatHistory.push({ role: 'assistant', content: "Hello! I'm Ben. How can I help you today?" });
     }
   });
-
   document.getElementById('confirm-no').addEventListener('click', () => toast.classList.remove('show'));
 
   // ── Init ──
