@@ -54,7 +54,7 @@
       to   { opacity: 1;   transform: translateX(-50%) scale(1.2); }
     }
 
-    /* ── Top bar (only visible during chat) ── */
+    /* ── Top bar ── */
     .top-bar {
       display: none;
       align-items: center;
@@ -79,7 +79,6 @@
       color: var(--text-muted);
       font-family: 'DM Sans', sans-serif;
       font-size: 0.75rem;
-      font-weight: 400;
       padding: 0.4rem 0.8rem;
       border-radius: 8px;
       cursor: pointer;
@@ -157,7 +156,7 @@
       line-height: 1.65;
     }
 
-    /* Preset cards — text only, compact */
+    /* Preset cards */
     .preset-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -204,9 +203,7 @@
       line-height: 1.4;
     }
 
-    .preset-card:hover .preset-text {
-      color: var(--text);
-    }
+    .preset-card:hover .preset-text { color: var(--text); }
 
     /* ── Chat messages ── */
     .chat-messages {
@@ -224,6 +221,7 @@
     .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     .chat-messages.hidden { display: none; }
 
+    /* ── Messages — styled via CSS, chat.js just adds .message + .user-message/.assistant-message ── */
     .message {
       display: flex;
       gap: 0.75rem;
@@ -239,47 +237,61 @@
     .message.user-message  { align-self: flex-end; flex-direction: row-reverse; }
     .message.assistant-message { align-self: flex-start; }
 
-    .avatar {
-      width: 32px; height: 32px;
+    /* Pseudo-element avatars — no extra DOM needed, won't break chat.js */
+    .message::before {
+      content: '◎';
+      width: 32px;
+      height: 32px;
       border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
       flex-shrink: 0;
       margin-top: 2px;
-    }
-
-    .user-message .avatar {
       background: linear-gradient(135deg, var(--orange), #ff5f1f);
       box-shadow: 0 0 14px var(--orange-glow);
+      color: white;
     }
 
-    .assistant-message .avatar {
+    .message.assistant-message::before {
+      content: '✦';
       background: var(--surface2);
       border: 1px solid var(--border-lit);
+      box-shadow: none;
+      color: var(--text-muted);
     }
 
-    .message-bubble {
+    .message p {
+      white-space: pre-line;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    /* The <p> inside .message is the bubble */
+    .message > p,
+    .message > div {
       padding: 0.85rem 1.1rem;
       border-radius: var(--radius);
       font-size: 0.92rem;
       line-height: 1.65;
     }
 
-    .message-bubble p { white-space: pre-line; margin: 0; overflow-wrap: anywhere; }
-
-    .user-message .message-bubble {
+    .user-message > p,
+    .user-message > div {
       background: var(--user-bg);
       border: 1px solid var(--border-lit);
       border-bottom-right-radius: 4px;
     }
 
-    .assistant-message .message-bubble {
+    .assistant-message > p,
+    .assistant-message > div {
       background: var(--ai-bg);
       border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
     }
 
-    /* Typing indicator */
+    /* ── Typing indicator ── */
     .typing-indicator {
       display: none;
       align-items: center;
@@ -289,17 +301,26 @@
 
     .typing-indicator.visible { display: flex; }
 
-    .typing-avatar {
-      width: 32px; height: 32px;
+    /* Avatar for typing indicator */
+    .typing-indicator::before {
+      content: '✦';
+      width: 32px;
+      height: 32px;
       border-radius: 10px;
       background: var(--surface2);
       border: 1px solid var(--border-lit);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem; flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      color: var(--text-muted);
     }
 
     .typing-dots {
-      display: flex; align-items: center; gap: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       background: var(--ai-bg);
       border: 1px solid var(--border);
       padding: 0.75rem 1rem;
@@ -322,7 +343,7 @@
       40% { transform: scale(1.2); opacity: 1; }
     }
 
-    /* Input area */
+    /* ── Input area ── */
     .message-input-area {
       padding: 0.75rem 0 0;
       flex-shrink: 0;
@@ -358,6 +379,7 @@
     }
 
     #user-input::placeholder { color: var(--text-muted); }
+    #user-input:disabled { opacity: 0.5; }
 
     #send-button {
       width: 38px; height: 38px;
@@ -387,7 +409,7 @@
 
     #send-button:hover:not(:disabled) svg { transform: translateX(1px) translateY(-1px); }
 
-    /* Disclaimer */
+    /* ── Disclaimer ── */
     .disclaimer {
       display: flex;
       align-items: center;
@@ -397,7 +419,6 @@
       font-size: 0.69rem;
       color: var(--text-muted);
       letter-spacing: 0.02em;
-      line-height: 1.5;
       opacity: 0.7;
     }
 
@@ -418,7 +439,7 @@
       z-index: 1;
     }
 
-    /* Confirm delete toast */
+    /* ── Confirm toast ── */
     .confirm-toast {
       position: fixed;
       top: 1rem;
@@ -455,11 +476,7 @@
       border: none;
     }
 
-    .confirm-toast .btn-confirm {
-      background: #e5534b;
-      color: white;
-    }
-
+    .confirm-toast .btn-confirm { background: #e5534b; color: white; }
     .confirm-toast .btn-cancel {
       background: transparent;
       border: 1px solid var(--border) !important;
@@ -475,7 +492,7 @@
 </head>
 <body>
 
-<!-- Top bar with delete button (only in chat mode) -->
+<!-- Top bar — shown only when chat is active -->
 <div class="top-bar" id="top-bar">
   <button id="delete-btn" aria-label="Clear conversation">
     <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
@@ -494,18 +511,17 @@
     <div class="preset-grid" id="preset-grid"></div>
   </div>
 
-  <!-- Messages (hidden until first send) -->
+  <!-- chat-messages: chat.js appends .message.user-message / .message.assistant-message directly here -->
   <div id="chat-messages" class="chat-messages hidden"></div>
 
-  <!-- Typing indicator -->
+  <!-- Typing indicator: chat.js toggles .visible on this -->
   <div class="typing-indicator" id="typing-indicator">
-    <div class="typing-avatar">✦</div>
     <div class="typing-dots">
       <span></span><span></span><span></span>
     </div>
   </div>
 
-  <!-- Input -->
+  <!-- Input: chat.js reads #user-input and #send-button -->
   <div class="message-input-area">
     <div class="input-wrapper">
       <textarea
@@ -534,12 +550,17 @@
   <button class="btn-cancel" id="confirm-no">Cancel</button>
 </div>
 
+<!-- chat.js must load first — it wires up #user-input, #send-button, #chat-messages, #typing-indicator -->
 <script src="chat.js"></script>
 
 <script>
   const STORAGE_KEY = 'ben_chat_history';
+  const welcomeScreen = document.getElementById('welcome-screen');
+  const chatMessagesEl = document.getElementById('chat-messages');
+  const topBar = document.getElementById('top-bar');
+  const presetGrid = document.getElementById('preset-grid');
 
-  // ── Preset questions pool ──
+  // ── Preset questions ──
   const ALL_PRESETS = [
     { text: 'Give me 5 creative project ideas for a weekend' },
     { text: 'Help me write a strong professional bio' },
@@ -560,8 +581,7 @@
   }
 
   function renderPresets(presets) {
-    const grid = document.getElementById('preset-grid');
-    grid.innerHTML = '';
+    presetGrid.innerHTML = '';
     presets.forEach((p, i) => {
       const card = document.createElement('button');
       card.className = 'preset-card';
@@ -569,128 +589,130 @@
       card.innerHTML = `<span class="preset-text">${p.text}</span>`;
       card.addEventListener('click', () => {
         document.getElementById('user-input').value = p.text;
-        resizeTextarea();
-        triggerSend();
+        // Trigger resize
+        const ev = new Event('input');
+        document.getElementById('user-input').dispatchEvent(ev);
+        // Let chat.js handle the actual send
+        showChat();
+        document.getElementById('send-button').click();
       });
-      grid.appendChild(card);
+      presetGrid.appendChild(card);
     });
   }
 
-  // Cycle presets every 20s (slow)
   renderPresets(pickPresets());
+
+  // Cycle every 20s
   setInterval(() => {
-    const welcome = document.getElementById('welcome-screen');
-    if (welcome.classList.contains('hidden')) return;
-    const grid = document.getElementById('preset-grid');
-    grid.style.opacity = '0';
+    if (welcomeScreen.classList.contains('hidden')) return;
+    presetGrid.style.opacity = '0';
     setTimeout(() => {
       renderPresets(pickPresets());
-      grid.style.opacity = '1';
-    }, 420);
+      presetGrid.style.opacity = '1';
+    }, 400);
   }, 20000);
 
-  // ── DOM refs ──
-  const chatMessages = document.getElementById('chat-messages');
-  const welcomeScreen = document.getElementById('welcome-screen');
-  const topBar = document.getElementById('top-bar');
-  const textarea = document.getElementById('user-input');
+  // ── Show chat view ──
+  function showChat() {
+    if (!welcomeScreen.classList.contains('hidden')) {
+      welcomeScreen.classList.add('hidden');
+      chatMessagesEl.classList.remove('hidden');
+      topBar.classList.add('visible');
+    }
+  }
 
-  // ── localStorage helpers ──
+  // ── localStorage ──
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
   }
 
-  function saveMessage(role, text) {
-    const history = loadHistory();
-    history.push({ role, text, ts: Date.now() });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  function saveToStorage(role, text) {
+    const h = loadHistory();
+    h.push({ role, text });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
   }
 
-  function clearHistory() {
+  function clearStorage() {
     localStorage.removeItem(STORAGE_KEY);
   }
 
-  // ── Restore saved messages on load ──
+  // ── Restore history on load ──
+  // We patch chatHistory (the array in chat.js) and render the saved messages visually
   function restoreHistory() {
-    const history = loadHistory();
-    if (!history.length) return;
+    const saved = loadHistory();
+    if (!saved.length) return;
+
     showChat();
-    history.forEach(({ role, text }) => {
-      const el = createMessageEl(role, text);
-      el.style.animation = 'none'; // no animation on restore
-      chatMessages.appendChild(el);
+
+    // Rebuild chat.js's internal chatHistory state so it sends correct context
+    // chat.js initializes chatHistory with one assistant message; we replace it
+    if (typeof chatHistory !== 'undefined') {
+      chatHistory.length = 0;
+      saved.forEach(({ role, text }) => {
+        chatHistory.push({ role, content: text });
+      });
+    }
+
+    // Render saved messages visually (no animation)
+    saved.forEach(({ role, text }) => {
+      const el = document.createElement('div');
+      el.className = `message ${role}-message`;
+      el.style.animation = 'none';
+      el.innerHTML = `<p>${text}</p>`;
+      chatMessagesEl.appendChild(el);
     });
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }
 
-  // ── Show chat, hide welcome ──
-  function showChat() {
-    if (!welcomeScreen.classList.contains('hidden')) {
-      welcomeScreen.classList.add('hidden');
-      chatMessages.classList.remove('hidden');
-    }
-    topBar.classList.add('visible');
-  }
-
-  // ── Auto-resize textarea ──
-  function resizeTextarea() {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
-  }
-  textarea.addEventListener('input', resizeTextarea);
-
-  // ── Trigger send ──
-  function triggerSend() {
-    if (textarea.value.trim()) {
-      showChat();
-      document.getElementById('send-button').click();
-    }
-  }
-
-  document.getElementById('send-button').addEventListener('click', () => {
-    if (textarea.value.trim()) showChat();
-  }, true);
-
-  // ── Message element builder ──
-  function createMessageEl(role, text) {
-    const wrapper = document.createElement('div');
-    wrapper.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role === 'user' ? '◎' : '✦';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'message-bubble';
-    const p = document.createElement('p');
-    p.textContent = text;
-    bubble.appendChild(p);
-
-    wrapper.appendChild(avatar);
-    wrapper.appendChild(bubble);
-    return wrapper;
-  }
-
-  // ── Intercept messages added by chat.js, upgrade + save ──
+  // ── Intercept chat.js message appends to: show chat + save to localStorage ──
+  // We watch for new .message elements added by chat.js
+  // IMPORTANT: we do NOT replace or modify elements — only observe and save
   const observer = new MutationObserver(mutations => {
     for (const m of mutations) {
       for (const node of m.addedNodes) {
-        if (node.nodeType !== 1) continue;
-        if (node.classList.contains('message') && !node.querySelector('.avatar')) {
-          showChat();
-          const isUser = node.classList.contains('user-message');
-          const role = isUser ? 'user' : 'assistant';
+        if (node.nodeType !== 1 || !node.classList.contains('message')) continue;
+        showChat();
+
+        // Save to localStorage once text is available
+        // For streaming assistant messages, text builds up — we save on finalize
+        // We use a small trick: save user messages immediately, save assistant on next tick
+        const isUser = node.classList.contains('user-message');
+        if (isUser) {
           const text = node.querySelector('p')?.textContent || '';
-          const upgraded = createMessageEl(role, text);
-          chatMessages.replaceChild(upgraded, node);
-          saveMessage(role, text);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+          if (text) saveToStorage('user', text);
+        } else {
+          // Assistant message: text streams in, wait for it to finish
+          // We watch the p element for changes and save when streaming stops
+          const p = node.querySelector('p');
+          if (!p) continue;
+          let saveTimer = null;
+          const textObserver = new MutationObserver(() => {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+              // No updates for 800ms = streaming done
+              const finalText = p.textContent || '';
+              if (finalText) {
+                // Update stored history — replace last assistant entry if it exists
+                const h = loadHistory();
+                // Remove any incomplete assistant entry we may have added
+                if (h.length && h[h.length - 1].role === 'assistant' && h[h.length - 1]._pending) {
+                  h.pop();
+                }
+                h.push({ role: 'assistant', text: finalText });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
+              }
+              textObserver.disconnect();
+            }, 800);
+          });
+          textObserver.observe(p, { childList: true, characterData: true, subtree: true });
         }
       }
     }
   });
-  observer.observe(chatMessages, { childList: true });
+
+  observer.observe(chatMessagesEl, { childList: true });
 
   // ── Delete / clear chat ──
   const toast = document.getElementById('confirm-toast');
@@ -701,25 +723,32 @@
 
   document.getElementById('confirm-yes').addEventListener('click', () => {
     toast.classList.remove('show');
-    clearHistory();
-    // Remove all messages
-    chatMessages.innerHTML = '';
-    chatMessages.classList.add('hidden');
+    clearStorage();
+
+    // Clear visual messages
+    chatMessagesEl.innerHTML = '';
+    chatMessagesEl.classList.add('hidden');
     topBar.classList.remove('visible');
     welcomeScreen.classList.remove('hidden');
-    // Reset welcome animation
     welcomeScreen.style.animation = 'none';
-    requestAnimationFrame(() => {
-      welcomeScreen.style.animation = '';
-    });
+    requestAnimationFrame(() => { welcomeScreen.style.animation = ''; });
     renderPresets(pickPresets());
+
+    // Reset chat.js's internal state
+    if (typeof chatHistory !== 'undefined') {
+      chatHistory.length = 0;
+      chatHistory.push({
+        role: 'assistant',
+        content: "Hello! I'm Ben. How can I help you today?"
+      });
+    }
   });
 
   document.getElementById('confirm-no').addEventListener('click', () => {
     toast.classList.remove('show');
   });
 
-  // ── Init: restore saved history ──
+  // ── Init ──
   restoreHistory();
 </script>
 </body>
