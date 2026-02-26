@@ -1352,20 +1352,22 @@ new MutationObserver(mutations=>{
         if(!S.titleSet){S.titleSet=true;genTitle(text);}
       },0);
     } else {
+      // Assistant message: poll until chat.js stops updating it (isProcessing goes false)
       attachActs(node);
-      let timer=null;
-      const w=new MutationObserver(()=>{
-        clearTimeout(timer);
-        timer=setTimeout(()=>{
-          w.disconnect();
-          const p=node.querySelector('p'); if(!p) return;
-          const ft=p.textContent||'';
+      const poll = setInterval(()=>{
+        if(typeof isProcessing !== 'undefined' && !isProcessing){
+          clearInterval(poll);
+          const p = node.querySelector('p');
+          if(!p) return;
+          const ft = p.textContent || '';
+          if(!ft) return;
           applyMD(p);
-          if(ft){const h=loadH();h.push({role:'assistant',text:ft});localStorage.setItem(SK,JSON.stringify(h));}
+          const h=loadH(); h.push({role:'assistant',text:ft}); localStorage.setItem(SK,JSON.stringify(h));
           msgsEl.scrollTop=msgsEl.scrollHeight;
-        },900);
-      });
-      w.observe(node,{childList:true,subtree:true,characterData:true});
+        }
+      }, 200);
+      // Safety timeout — give up after 60s
+      setTimeout(()=>clearInterval(poll), 60000);
     }
   }
 }).observe(msgsEl,{childList:true});
