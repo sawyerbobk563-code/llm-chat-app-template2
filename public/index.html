@@ -270,42 +270,41 @@ body{
 }
 .msgs.hidden{display:none;}
 
-.msg{
+/* chat.js uses these class names — map them to our styles */
+.message{
   display:flex;gap:.55rem;
   animation:min .2s cubic-bezier(.16,1,.3,1) both;
   max-width:82%;position:relative;
 }
 @keyframes min{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.msg.u{align-self:flex-end;flex-direction:row-reverse;}
-.msg.a{align-self:flex-start;}
+.user-message{align-self:flex-end;flex-direction:row-reverse;}
+.assistant-message{align-self:flex-start;}
 
 /* avatars — NO stars. clean geometric shapes */
-.msg::before{
+.message::before{
   content:'';
   width:25px;height:25px;min-width:25px;
   border-radius:7px;flex-shrink:0;margin-top:4px;
   background:linear-gradient(135deg,var(--orange),#c05010);
   box-shadow:0 0 7px var(--og-glow);
-  /* user: minimal person */
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='8' r='3.2'/%3E%3Cpath d='M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6'/%3E%3C/svg%3E");
   background-size:64%;background-repeat:no-repeat;background-position:center;
 }
-.msg.a::before{
+.assistant-message::before{
   background:var(--s3);
   border:1px solid var(--og-b);
   box-shadow:none;
-  /* ai: simple waveform bars — clean, no stars */
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f6821f' stroke-width='2.2' stroke-linecap='round'%3E%3Cline x1='4' y1='12' x2='4' y2='12'/%3E%3Cline x1='8' y1='8' x2='8' y2='16'/%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='16' y1='9' x2='16' y2='15'/%3E%3Cline x1='20' y1='12' x2='20' y2='12'/%3E%3C/svg%3E");
   background-size:72%;background-repeat:no-repeat;background-position:center;
 }
 
-.msg>p{
+.message>p{
   padding:.68rem .9rem;border-radius:var(--r);
   font-size:.855rem;line-height:1.72;flex:1;min-width:0;
 }
-.msg.u>p{background:var(--og-dim);border:1px solid var(--og-b);border-bottom-right-radius:3px;white-space:pre-line;overflow-wrap:anywhere;}
-.msg.a>p{background:var(--s2);border:1px solid var(--b1);border-bottom-left-radius:3px;white-space:pre-line;}
-.msg.a>p.md{white-space:normal;}
+.user-message>p{background:var(--og-dim);border:1px solid var(--og-b);border-bottom-right-radius:3px;white-space:pre-line;overflow-wrap:anywhere;}
+.assistant-message>p{background:var(--s2);border:1px solid var(--b1);border-bottom-left-radius:3px;white-space:pre-line;}
+.assistant-message>p.md{white-space:normal;}
 
 /* markdown */
 .md p{margin-bottom:.48em;}.md p:last-child{margin-bottom:0;}
@@ -339,8 +338,8 @@ body{
 
 /* msg actions */
 .macts{display:flex;gap:.22rem;margin-top:.12rem;opacity:0;transition:opacity .1s;padding-left:calc(25px + .55rem);}
-.msg.u~.macts{justify-content:flex-end;padding-left:0;padding-right:calc(25px + .55rem);}
-.msg:hover~.macts,.macts:hover{opacity:1!important;}
+.user-message~.macts{justify-content:flex-end;padding-left:0;padding-right:calc(25px + .55rem);}
+.message:hover~.macts,.macts:hover{opacity:1!important;}
 .mab{display:flex;align-items:center;gap:.22rem;background:var(--s2);border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:.65rem;padding:.18rem .45rem;cursor:pointer;transition:all .1s;}
 .mab:hover{color:var(--text);border-color:var(--b2);background:var(--s3);}
 .mab.ok{color:var(--green);border-color:#3ecf8e24;}
@@ -363,7 +362,7 @@ body{
 
 /* typing dots */
 .typing{display:none;align-items:center;gap:.55rem;padding:0 0 .28rem;}
-.typing.on{display:flex;}
+.typing.visible{display:flex;}
 .typing::before{
   content:'';width:25px;height:25px;min-width:25px;border-radius:7px;
   background:var(--s3);border:1px solid var(--og-b);flex-shrink:0;
@@ -406,7 +405,7 @@ body{
 .pill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 .pill-dot.cf{background:var(--orange);}
 .pill-dot.ms{background:var(--blue);}
-#send-btn{
+#send-button{
   width:31px;height:31px;flex-shrink:0;
   background:linear-gradient(135deg,var(--orange),#b84d0d);
   color:white;border:none;border-radius:7px;cursor:pointer;
@@ -414,11 +413,11 @@ body{
   transition:transform .12s,box-shadow .12s;
   box-shadow:0 0 10px var(--og-glow);
 }
-#send-btn:hover{transform:scale(1.08);box-shadow:0 0 18px var(--og-glow);}
-#send-btn:active{transform:scale(.95);}
-#send-btn:disabled{background:var(--s3);box-shadow:none;cursor:not-allowed;opacity:.4;}
-#send-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .12s;}
-#send-btn:hover:not(:disabled) svg{transform:translate(1px,-1px);}
+#send-button:hover{transform:scale(1.08);box-shadow:0 0 18px var(--og-glow);}
+#send-button:active{transform:scale(.95);}
+#send-button:disabled{background:var(--s3);box-shadow:none;cursor:not-allowed;opacity:.4;}
+#send-button svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .12s;}
+#send-button:hover:not(:disabled) svg{transform:translate(1px,-1px);}
 .disclaimer{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:.35rem;font-size:.61rem;color:var(--t3);opacity:.45;}
 .disclaimer svg{width:9px;height:9px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 footer{text-align:center;font-size:.58rem;color:#1c1924;padding:.22rem 1rem .45rem;flex-shrink:0;z-index:1;}
@@ -686,9 +685,9 @@ textarea.fi{resize:vertical;min-height:76px;line-height:1.6;font-size:.78rem;}
       <div class="preset-grid" id="preset-grid"></div>
     </div>
 
-    <div class="msgs hidden" id="msgs"></div>
+    <div class="msgs hidden" id="chat-messages"></div>
 
-    <div class="typing" id="typing">
+    <div class="typing" id="typing-indicator">
       <div class="tdots"><span></span><span></span><span></span></div>
     </div>
 
@@ -700,7 +699,7 @@ textarea.fi{resize:vertical;min-height:76px;line-height:1.6;font-size:.78rem;}
             <div class="pill-dot cf" id="pill-dot"></div>
             <span id="pill-lbl">8B</span>
           </button>
-          <button id="send-btn" aria-label="Send">
+          <button id="send-button" aria-label="Send">
             <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
@@ -877,11 +876,11 @@ let S = {
 
 // DOM
 const welcome  = document.getElementById('welcome');
-const msgsEl   = document.getElementById('msgs');
+const msgsEl   = document.getElementById('chat-messages');
 const topbar   = document.getElementById('topbar');
 const inpArea  = document.getElementById('inp-area');
 const inputEl  = document.getElementById('user-input');
-const typingEl = document.getElementById('typing');
+const typingEl = document.getElementById('typing-indicator');
 const ctst     = document.getElementById('ctst');
 const tstEl    = document.getElementById('tst');
 
@@ -957,6 +956,8 @@ function applyModelUI(){
   document.getElementById('cf-badge').className = `nav-badge ${isMs?'b-blue':'b-orange'}`;
   document.getElementById('pbtn-cf').className = `pbtn ${S.provider==='cf'?'acf':''}`;
   document.getElementById('pbtn-ms').className = `pbtn ${S.provider==='mistral'?'ams':''}`;
+  // Expose for chat.js
+  window.__selectedModel = S.provider==='cf' ? S.model : undefined;
 }
 
 function switchProvider(p){
@@ -1324,7 +1325,9 @@ function restoreHistory(){
   if(st){S.title=st;S.titleSet=true;document.getElementById('chat-title').textContent=st;}
   if(typeof chatHistory!=='undefined'){chatHistory.length=0;saved.forEach(({role,text})=>chatHistory.push({role,content:text}));}
   saved.forEach(({role,text})=>{
-    const el=document.createElement('div'); el.className=`msg ${role==='user'?'u':'a'}`; el.style.animation='none';
+    const el=document.createElement('div');
+    el.className=`message ${role==='user'?'user-message':'assistant-message'}`;
+    el.style.animation='none';
     const p=document.createElement('p'); p.textContent=text; el.appendChild(p);
     if(role==='assistant') applyMD(p);
     msgsEl.appendChild(el); attachActs(el);
@@ -1342,8 +1345,6 @@ new MutationObserver(mutations=>{
     seen.add(node); showChatView();
     const isUser=node.classList.contains('user-message');
     if(isUser){
-      // re-class to our scheme
-      node.classList.remove('user-message'); node.classList.add('msg','u');
       attachActs(node);
       setTimeout(()=>{
         const text=node.querySelector('p')?.textContent||''; if(!text) return;
@@ -1351,7 +1352,6 @@ new MutationObserver(mutations=>{
         if(!S.titleSet){S.titleSet=true;genTitle(text);}
       },0);
     } else {
-      node.classList.remove('assistant-message'); node.classList.add('msg','a');
       attachActs(node);
       let timer=null;
       const w=new MutationObserver(()=>{
